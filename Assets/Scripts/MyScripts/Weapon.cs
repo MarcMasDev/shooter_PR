@@ -55,7 +55,8 @@ public abstract class Weapon : MonoBehaviour
 
     protected void ApplyDamage(RaycastHit hit)
     {
-        if (hit.collider.TryGetComponent(out IDamageable damageable))
+        IDamageable damageable = hit.collider.GetComponentInParent<IDamageable>();
+        if (damageable != null)
         {
             damageable.TakeDamage(weaponInfo.damage);
         }

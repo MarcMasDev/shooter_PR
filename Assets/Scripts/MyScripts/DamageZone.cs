@@ -5,31 +5,56 @@ public class DamageZone : MonoBehaviour
     [SerializeField] private float damage = 1000;
     [SerializeField] private float timeBetweenDamage = 1;
     [SerializeField] private bool damageOnEntry = true;
-    [SerializeField] private bool damageOnlyPlayer = false;
+    [SerializeField] private float damageOnSpeed = 0;
+    [SerializeField] private GameObject damageVFX;
+
+    [SerializeField] private LayerMask targetLayers;
+
+    private Rigidbody rb;
+
     private float time = 0;
     private void OnTriggerEnter(Collider other)
     {
-        if (other.TryGetComponent(out IDamageable damageable))
-        {
-            time = timeBetweenDamage;
-
-            if ((damageOnlyPlayer && !other.CompareTag("Player")) || !damageOnEntry) return;
-
-            damageable.TakeDamage(damage);
-        }
+        if (!IsInLayerMask(other.gameObject.layer, targetLayers)) return;
+        if (!PassesSpeedCheck(other)) return;
+        if (!damageOnEntry) return;
+        DealDamage(other);
     }
     private void OnTriggerStay(Collider other)
     {
-        time -= Time.deltaTime;
-        if (time < 0)
-        {
-            time = timeBetweenDamage; 
-            if (other.TryGetComponent(out IDamageable damageable))
-            {
-                if (damageOnlyPlayer && other.CompareTag("Player")) damageable.TakeDamage(damage);
-                else if (!damageOnlyPlayer) damageable.TakeDamage(damage);
-            }
-        }
+        if (!IsInLayerMask(other.gameObject.layer, targetLayers)) return;
+        if (!PassesSpeedCheck(other)) return;
 
+        time -= Time.deltaTime;
+        if (time < 0) DealDamage(other);
+    }
+
+    private bool IsInLayerMask(int layer, LayerMask mask)
+    {
+        return (mask.value & (1 << layer)) != 0;
+    }
+
+    private bool PassesSpeedCheck(Collider other)
+    {
+        if (damageOnSpeed <= 0) return true;
+        if (rb == null) rb = GetComponent<Rigidbody>();
+
+        if (rb != null)
+        {
+            float currentSpeed = rb.linearVelocity.magnitude;
+            return currentSpeed >= damageOnSpeed;
+        }
+        return false;
+    }
+
+    private void DealDamage(Collider other)
+    {
+        IDamageable damageable = other.GetComponentInParent<IDamageable>();
+
+        if (damageable != null)
+        {
+            time = timeBetweenDamage;
+            damageable.TakeDamage(damage, damageVFX);
+        }
     }
 }

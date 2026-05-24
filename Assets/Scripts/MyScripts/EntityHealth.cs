@@ -1,7 +1,7 @@
 using UnityEngine;
 public interface IDamageable
 {
-    void TakeDamage(float amount);
+    void TakeDamage(float amount, GameObject deathFX = null);
 }
 public class EntityHealth : MonoBehaviour, IDamageable
 {
@@ -10,19 +10,22 @@ public class EntityHealth : MonoBehaviour, IDamageable
     [SerializeField] private float maxShield = 100f;
     [SerializeField] private float startShield = 100f;
     [SerializeField] [Range(0,1)] private float shieldProtection = 0.75f;
+    private RagdollAgent ragdoll;
     private float currentHealth;
    private float currentShield;
 
     private void Start()
     {
         startShield = Mathf.Min(maxShield, startShield);
+        ragdoll = GetComponent<RagdollAgent>();
 
         Heal(maxHealth, startShield); //Updates UI and sets init values
     }
 
-    public void TakeDamage(float amount)
+    public void TakeDamage(float amount, GameObject deathFX = null)
     {
         if (currentHealth <= 0) return;
+        if (deathFX != null) Instantiate(deathFX, transform.position, Quaternion.identity);
 
         float damageToShield = amount * shieldProtection;
         float damageToHealth = amount - damageToShield;
@@ -44,10 +47,7 @@ public class EntityHealth : MonoBehaviour, IDamageable
 
         if (m_StateBlackboard != null) m_StateBlackboard.TriggerHurt(new Vector2(currentHealth,maxHealth), new Vector2(currentShield, maxShield));
 
-        if (currentHealth <= 0)
-        {
-            Die();
-        }
+        if (currentHealth <= 0) Die();
     }
 
     public void Heal(float healthAmount, float shieldAmount)
@@ -59,7 +59,7 @@ public class EntityHealth : MonoBehaviour, IDamageable
     }
     private void Die()
     {
-        m_StateBlackboard.TriggerDeath();
+        if (ragdoll != null) ragdoll.EnableRagdoll();
     }
     public Vector2 GetCurrentAndMaxHealth() => new Vector2(currentHealth, maxHealth);
     public Vector2 GetCurrentAndMaxShield() => new Vector2(currentShield, maxShield);
