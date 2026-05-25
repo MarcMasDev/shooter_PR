@@ -38,13 +38,17 @@ public class EnemySensors : MonoBehaviour
         {
             if (Vector3.Angle(transform.forward, dirToPlayer) < viewAngle / 2f)
             {
-                // DEBUG: Dibuja una línea en la ventana de escena para ver el rayo
-                Debug.DrawRay(eyes.position, dirToPlayer * distanceToPlayer, Color.green);
-
-                // 3. El rayo ahora sale desde eyePosition
-                if (!Physics.Raycast(eyes.position, dirToPlayer, distanceToPlayer, obstacleMask))
+                Vector3 flatDirToPlayer = new Vector3(dirToPlayer.x, 0, dirToPlayer.z).normalized;
+                if (Vector3.Angle(transform.forward, flatDirToPlayer) < viewAngle / 2f)
                 {
-                    return true;
+                    //DEBUG: Dibuja una línea en la ventana de escena para ver el rayo
+                    Debug.DrawRay(eyes.position, dirToPlayer * distanceToPlayer, Color.green);
+
+                    //El rayo original sigue usando dirToPlayer para ver si hay obstáculos físicos
+                    if (!Physics.Raycast(eyes.position, dirToPlayer, distanceToPlayer, obstacleMask))
+                    {
+                        return true;
+                    }
                 }
             }
         }

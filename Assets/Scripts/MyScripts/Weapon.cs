@@ -45,28 +45,43 @@ public abstract class Weapon : MonoBehaviour
 
     protected void TriggerFeedback()
     {
-        m_StateBlackboard.TriggerAttack();
+        m_StateBlackboard.TriggerAttack(true);
         if (audioItems != null) AudioManager.instance.PlayOneShootFromArray(audioItems, SoundType.shoot);
     }
 
-    public void EnableInput() => m_StateBlackboard.m_IsPerformingAction = false;
+    public void EnableInput()
+    {
+        m_StateBlackboard.m_IsPerformingAction = false;
+        print("ENABLE!");
+    }
     public void DisableInput() => m_StateBlackboard.m_IsPerformingAction = true;
     public void HideWeapon() => m_StateBlackboard.TriggerSwap();
 
     protected void ApplyDamage(RaycastHit hit)
     {
+        float damage = weaponInfo.damage;
+        HitboxType hitbox = HitboxType.Body;
+
+        if (hit.collider.TryGetComponent(out Hitbox hitboxComponent))
+        {
+            hitbox = hitboxComponent.hitboxType;
+            damage *= HitboxDamage.GetMultiplier(hitbox);
+        }
+
         IDamageable damageable = hit.collider.GetComponentInParent<IDamageable>();
         if (damageable != null)
         {
-            damageable.TakeDamage(weaponInfo.damage);
+            ImpactResult result = damageable.TakeDamage(damage);
+
+            if (isPlayer && result != ImpactResult.alreadyDeath) ScoreManager.Instance.AddPoints(hitbox, result == ImpactResult.death);
         }
     }
 
     protected void ImpactVFX(RaycastHit hit)
     {
         GameObject prefabToSpawn = impact;
-
-        if (IsBloodAgent(hit.collider)) prefabToSpawn = bloodEffect;
+        bool isBlood = IsBloodAgent(hit.collider);
+        if (isBlood) prefabToSpawn = bloodEffect;
 
         if (prefabToSpawn != null)
         {
@@ -78,7 +93,7 @@ public abstract class Weapon : MonoBehaviour
             GameObject vfxInstance = Instantiate(prefabToSpawn, spawnPos, spawnRot);
 
             //Lo ponemos como hijo, asi se mueve con el padre.
-            vfxInstance.transform.SetParent(hit.transform);
+            if (!isBlood)  vfxInstance.transform.SetParent(hit.transform);
 
             Destroy(vfxInstance, vfxDestroyTime);
         }

@@ -13,7 +13,6 @@ public class EnemyInput : MonoBehaviour, IEntityInput
     public bool IsAiming { get; set; }
     public bool IsShooting { get; set; }
     public bool IsReloading { get; set; }
-    public bool IsFlashlight { get; set; }
     public float MouseScrollDelta { get; set; }
     public int WeaponSwapIndex { get; set; } = -1;
 

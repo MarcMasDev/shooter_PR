@@ -9,7 +9,6 @@ public interface IEntityInput
     bool IsAiming { get; }
     bool IsShooting { get; }
     bool IsReloading { get; }
-    bool IsFlashlight { get; }
     bool IsInteracting { get; }
     int WeaponSwapIndex { get; }
     float MouseScrollDelta { get; }

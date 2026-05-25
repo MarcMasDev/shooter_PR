@@ -13,8 +13,7 @@ public class CharacterAnimationManager : MonoBehaviour
     {
         if (m_StateBlackboard != null)
         {
-            m_StateBlackboard.OnAttack += Attack;
-            m_StateBlackboard.OnFullAutoAttack += OnFullAutoAttack;
+            m_StateBlackboard.OnAttack += OnAttack;
             m_StateBlackboard.OnReload += Reload;
             m_StateBlackboard.OnHide += Hide;
             m_StateBlackboard.OnHurt += Hurt;
@@ -28,8 +27,7 @@ public class CharacterAnimationManager : MonoBehaviour
     {
         if (m_StateBlackboard != null)
         {
-            m_StateBlackboard.OnAttack -= Attack;
-            m_StateBlackboard.OnFullAutoAttack -= OnFullAutoAttack;
+            m_StateBlackboard.OnAttack -= OnAttack;
             m_StateBlackboard.OnReload -= Reload;
             m_StateBlackboard.OnHide -= Hide;
             m_StateBlackboard.OnHurt -= Hurt;
@@ -47,8 +45,7 @@ public class CharacterAnimationManager : MonoBehaviour
         m_Animator.SetBool("IsAiming", m_StateBlackboard.GetAim()); 
     }
 
-    private void Attack() => m_Animator.SetTrigger("Attack");
-    private void OnFullAutoAttack(bool isFiring) => m_Animator.SetBool("AttackAuto", isFiring);
+    private void OnAttack(bool isFiring) => m_Animator.SetBool("Attack", isFiring);
     private void Reload() => m_Animator.SetTrigger("Reload");
     private void Hide() => m_Animator.SetTrigger("Hide");
     private void Jump() => m_Animator.SetTrigger("Jump");

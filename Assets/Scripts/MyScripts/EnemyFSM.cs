@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -11,24 +12,27 @@ public class EnemyFSM : MonoBehaviour
     [Header("FSM Settings")]
     public EnemyState currentState = EnemyState.Patrol;
     [SerializeField] private EnemyState onHurtState = EnemyState.Search;
-    public float attackRange = 10f;
+
+    [Header("Wander Settings")]
+    public float wanderRadius = 15f;
+    public float wanderTimer = 5f;
+    private float timer;
 
     [Header("Search Settings")]
     public float rotationSpeed = 120f;
     private float rotatedSum = 0f;
 
-    [Header("Dissolve Settings")]
-    [SerializeField] private float dissolveDuration = 4f;
-    [SerializeField] private float dissolveDelay = 4f;
-    private static readonly int DissolveProperty = Shader.PropertyToID("_DissolveAmount");
-    private Renderer[] characterRenderers;
+
+    [Header("Attack Settings")]
+    public float attackRange = 10f;
+
+    private float patrolSpeed = 1.5f;
+    private float chaseSpeed = 3.5f;
 
     private NavMeshAgent agent;
     private EnemyInput virtualInput;
     private EnemySensors sensors;
     [SerializeField] private CharacterBlackboard blackboard;
-    public Transform[] waypoints;
-    private int currentWaypointIndex = 0;
     private bool isDeath = false;
     [SerializeField] private bool flying = false;
     public bool forceChase = false;
@@ -38,7 +42,6 @@ public class EnemyFSM : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
         virtualInput = GetComponent<EnemyInput>();
         sensors = GetComponent<EnemySensors>();
-        characterRenderers = GetComponentsInChildren<Renderer>();
     }
 
 
@@ -51,9 +54,11 @@ public class EnemyFSM : MonoBehaviour
     {
         if (isDeath) return;
         if (blackboard != null)
+        {
             blackboard.SetNormalizedSpeed(agent.velocity.magnitude, agent.speed);
+            virtualInput.LookDirection = transform.forward;
+        }
 
-        virtualInput.LookDirection = transform.forward;
 
         // Ejecutar lógica continua del estado
         switch (currentState)
@@ -65,6 +70,14 @@ public class EnemyFSM : MonoBehaviour
         }
 
         HandleOffMeshLinks();
+
+        CheckAttackState();
+    }
+    private void CheckAttackState()
+    {
+        Transform target = sensors.GetPlayerTransform();
+        float distance = Vector3.Distance(transform.position, target.position);
+        if (distance <= attackRange) ChangeState(EnemyState.Attack);
     }
 
     public void ChangeState(EnemyState newState)
@@ -102,7 +115,8 @@ public class EnemyFSM : MonoBehaviour
     private void OnPatrolEnter()
     {
         agent.isStopped = false;
-        if (waypoints.Length > 0) agent.SetDestination(waypoints[currentWaypointIndex].position);
+        agent.speed = patrolSpeed;
+        timer = wanderTimer; //Forzar que busque un punto inmediatamente
     }
     private void OnPatrolExit()
     {
@@ -122,6 +136,7 @@ public class EnemyFSM : MonoBehaviour
     private void OnChaseEnter()
     {
         agent.ResetPath();
+        agent.speed = chaseSpeed;
         agent.isStopped = false;
     }
 
@@ -132,13 +147,22 @@ public class EnemyFSM : MonoBehaviour
     }
     private void OnAttackEnter()
     {
+        agent.ResetPath();
+        agent.velocity = Vector3.zero;
         agent.isStopped = true;
         virtualInput.IsAiming = true;
+        blackboard.TriggerAttack(true);
     }
     private void OnAttackExit()
     {
         virtualInput.IsShooting = false;
         virtualInput.IsAiming = false;
+
+        if (blackboard != null)
+        {
+            blackboard.m_IsPerformingAction = false; //reset input
+            blackboard.TriggerAttack(false);
+        }
     }
 
     //Handles (updates de los estados)
@@ -147,10 +171,13 @@ public class EnemyFSM : MonoBehaviour
         if (sensors.CanSeePlayer()) { ChangeState(EnemyState.Chase); return; }
         if (sensors.CanHearPlayer()) { ChangeState(EnemyState.Search); return; }
 
-        if (agent.remainingDistance < 0.5f && !agent.pathPending && waypoints.Length > 0)
+        timer += Time.deltaTime;
+
+        if (timer >= wanderTimer || (agent.remainingDistance < 0.5f && !agent.pathPending))
         {
-            currentWaypointIndex = (currentWaypointIndex + 1) % waypoints.Length;
-            agent.SetDestination(waypoints[currentWaypointIndex].position);
+            Vector3 newPos = RandomNavSphere(transform.position, wanderRadius, -1);
+            agent.SetDestination(newPos);
+            timer = 0;
         }
     }
 
@@ -194,7 +221,7 @@ public class EnemyFSM : MonoBehaviour
         Transform target = sensors.GetPlayerTransform();
         if (target == null) { ChangeState(EnemyState.Search); return; }
 
-        //Mirar al objetivo
+        //Smoothly rotate toward target
         Vector3 direction = (target.position - transform.position).normalized;
         direction.y = 0;
         transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction), Time.deltaTime * 5f);
@@ -202,7 +229,7 @@ public class EnemyFSM : MonoBehaviour
         virtualInput.IsShooting = true;
 
         float distance = Vector3.Distance(transform.position, target.position);
-        if (distance > attackRange || !sensors.CanSeePlayer()) ChangeState(EnemyState.Chase);
+        if (distance > attackRange+ 0.25f) ChangeState(EnemyState.Chase); //leave some margin
     }
 
  
@@ -228,26 +255,6 @@ public class EnemyFSM : MonoBehaviour
         {
             Gizmos.color = Color.blue;
             Gizmos.DrawLine(transform.position, agent.destination);
-        }
-
-        //Visualización de los Waypoints de patrulla
-        if (waypoints != null && waypoints.Length > 0)
-        {
-            Gizmos.color = Color.yellow;
-            for (int i = 0; i < waypoints.Length; i++)
-            {
-                if (waypoints[i] == null) continue;
-
-                //Esfera en el waypoint
-                Gizmos.DrawSphere(waypoints[i].position, 0.3f);
-
-                //Línea entre waypoints para ver la ruta
-                int nextIndex = (i + 1) % waypoints.Length;
-                if (waypoints[nextIndex] != null)
-                {
-                    Gizmos.DrawLine(waypoints[i].position, waypoints[nextIndex].position);
-                }
-            }
         }
 
         //Cono de visión (si tienes acceso a la script de sensores)
@@ -304,43 +311,30 @@ public class EnemyFSM : MonoBehaviour
         //Desactivar Colision
         if (TryGetComponent<Collider>(out var col)) col.enabled = false;
 
-
-        //Ejecutar la desaparición
-        StartCoroutine(DissolveRoutine());
+        enabled = false;
     }
 
-    private IEnumerator DissolveRoutine()
+    //Función auxiliar para encontrar un punto válido en el NavMesh
+    private Vector3 RandomNavSphere(Vector3 origin, float dist, int layermask)
     {
-        //En HDRP, si el material no tenía el clipping activo, esto lo fuerza
-        foreach (Renderer r in characterRenderers)
-        {
-            if (r != null)
-            {
-                r.material.EnableKeyword("_ALPHATEST_ON");
-            }
-        }
+        Vector3 randomDirection = UnityEngine.Random.insideUnitSphere * dist;
+        randomDirection += origin;
 
-        float elapsedTime = 0;
 
-        yield return new WaitForSeconds(dissolveDelay); //Esperamos a que haya pasado un tiempo (animación de morir, cuerpo en el suelo
-        while (elapsedTime < dissolveDuration)
-        {
-            elapsedTime += Time.deltaTime;
-            float lerpTarget = Mathf.Clamp01(elapsedTime / dissolveDuration);
+        NavMeshHit navHit;
+        //Busca el punto válido más cercano dentro de la distancia especificada
+        if (NavMesh.SamplePosition(randomDirection, out navHit, dist, layermask)) return navHit.position;
 
-            foreach (Renderer r in characterRenderers)
-            {
-                if (r != null)
-                {
-                    //Al usar .material (y no .sharedMaterial) creamos una instancia única del material para cada enemigo.
-                    r.material.SetFloat(DissolveProperty, lerpTarget);
-                }
-            }
+        //Si por algún motivo falla, se queda donde está
+        return origin;
+    }
 
-            yield return null;
-        }
+    //El spawner llamará aquí nada más crear al zombie para decirle cómo de rápido es
+    public void SetupSpeeds(float walkSpeed, float runSpeed)
+    {
+        patrolSpeed = walkSpeed;
+        chaseSpeed = runSpeed;
 
-        //Finalmente destruimos el objeto
-        Destroy(gameObject);
+        agent.speed = patrolSpeed;
     }
 }

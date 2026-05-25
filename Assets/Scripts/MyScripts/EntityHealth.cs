@@ -1,7 +1,13 @@
 using UnityEngine;
+public enum ImpactResult
+{
+    alreadyDeath,
+    death,
+    impact
+}
 public interface IDamageable
 {
-    void TakeDamage(float amount, GameObject deathFX = null);
+    ImpactResult TakeDamage(float amount, GameObject deathFX = null);
 }
 public class EntityHealth : MonoBehaviour, IDamageable
 {
@@ -22,9 +28,9 @@ public class EntityHealth : MonoBehaviour, IDamageable
         Heal(maxHealth, startShield); //Updates UI and sets init values
     }
 
-    public void TakeDamage(float amount, GameObject deathFX = null)
+    public ImpactResult TakeDamage(float amount, GameObject deathFX = null)
     {
-        if (currentHealth <= 0) return;
+        if (currentHealth <= 0) return ImpactResult.alreadyDeath;
         if (deathFX != null) Instantiate(deathFX, transform.position, Quaternion.identity);
 
         float damageToShield = amount * shieldProtection;
@@ -47,7 +53,12 @@ public class EntityHealth : MonoBehaviour, IDamageable
 
         if (m_StateBlackboard != null) m_StateBlackboard.TriggerHurt(new Vector2(currentHealth,maxHealth), new Vector2(currentShield, maxShield));
 
-        if (currentHealth <= 0) Die();
+        if (currentHealth <= 0)
+        {
+            Die();
+            return ImpactResult.death;
+        }
+        return ImpactResult.impact;
     }
 
     public void Heal(float healthAmount, float shieldAmount)
@@ -59,6 +70,7 @@ public class EntityHealth : MonoBehaviour, IDamageable
     }
     private void Die()
     {
+        m_StateBlackboard.TriggerDeath();
         if (ragdoll != null) ragdoll.EnableRagdoll();
     }
     public Vector2 GetCurrentAndMaxHealth() => new Vector2(currentHealth, maxHealth);

@@ -5,6 +5,7 @@ public class DamageZone : MonoBehaviour
     [SerializeField] private float damage = 1000;
     [SerializeField] private float timeBetweenDamage = 1;
     [SerializeField] private bool damageOnEntry = true;
+    [SerializeField] private bool addPoints = false;
     [SerializeField] private float damageOnSpeed = 0;
     [SerializeField] private GameObject damageVFX;
 
@@ -54,7 +55,9 @@ public class DamageZone : MonoBehaviour
         if (damageable != null)
         {
             time = timeBetweenDamage;
-            damageable.TakeDamage(damage, damageVFX);
+            ImpactResult result = damageable.TakeDamage(damage, damageVFX);
+
+            if (addPoints && result != ImpactResult.alreadyDeath) ScoreManager.Instance.AddPoints(HitboxType.Body, result == ImpactResult.death);
         }
     }
 }

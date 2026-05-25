@@ -51,7 +51,7 @@ public class WeaponRanged : Weapon, IReloadable
             fireRoutine = null;
         }
 
-        m_StateBlackboard.TriggerFullAutoAttack(false);
+        m_StateBlackboard.TriggerAttack(false);
     }
 
     protected override void ExecuteAttack()
@@ -82,7 +82,7 @@ public class WeaponRanged : Weapon, IReloadable
     private IEnumerator FullAutoRoutine()
     {
         isFiring = true; 
-        m_StateBlackboard.TriggerFullAutoAttack(isFiring);
+        m_StateBlackboard.TriggerAttack(isFiring);
 
         while (isFiring)
         {
@@ -91,13 +91,13 @@ public class WeaponRanged : Weapon, IReloadable
         }
         isFiring = false;
         fireRoutine = null;
-        m_StateBlackboard.TriggerFullAutoAttack(false);
+        m_StateBlackboard.TriggerAttack(false);
     }
 
     private IEnumerator BurstRoutine()
     {
         isFiring = true;
-        m_StateBlackboard.TriggerFullAutoAttack(isFiring);
+        m_StateBlackboard.TriggerAttack(isFiring);
         for (int i = 0; i < weaponInfo.burstCount; i++)
         {
             ExecuteAttack();
@@ -106,7 +106,7 @@ public class WeaponRanged : Weapon, IReloadable
         nextFireTime = Time.time + (1f / weaponInfo.fireRate);
         isFiring = false;
         fireRoutine = null;
-        m_StateBlackboard.TriggerFullAutoAttack(false);
+        m_StateBlackboard.TriggerAttack(false);
     }
 
     public void Reload(bool useClip = true)
