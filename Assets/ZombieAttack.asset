@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WeaponClass
   weaponName: Zombie
   isMelee: 1
-  meleeRange: 3
+  meleeRange: 2
   fireMode: 0
   fireRate: 3
   burstCount: 3

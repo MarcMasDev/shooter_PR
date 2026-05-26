@@ -1,13 +1,10 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
 public enum EnemyState { Patrol, Search, Chase, Attack }
 
-[RequireComponent(typeof(NavMeshAgent), typeof(EnemyInput), typeof(EnemySensors))]
-public class EnemyFSM : MonoBehaviour
+[RequireComponent(typeof(EnemyInput), typeof(EnemySensors))]
+public class EnemyFSM : AgentFSM
 {
     [Header("FSM Settings")]
     public EnemyState currentState = EnemyState.Patrol;
@@ -29,38 +26,35 @@ public class EnemyFSM : MonoBehaviour
     private float patrolSpeed = 1.5f;
     private float chaseSpeed = 3.5f;
 
-    private NavMeshAgent agent;
     private EnemyInput virtualInput;
     private EnemySensors sensors;
-    [SerializeField] private CharacterBlackboard blackboard;
-    private bool isDeath = false;
     [SerializeField] private bool flying = false;
     public bool forceChase = false;
+    private Transform target;
 
-    private void Awake()
+    protected override void Awake()
     {
-        agent = GetComponent<NavMeshAgent>();
+        base.Awake();
         virtualInput = GetComponent<EnemyInput>();
         sensors = GetComponent<EnemySensors>();
     }
-
-
     private void Start()
     {
         EnterState(currentState);
     }
 
-    private void Update()
+    protected override void Update()
     {
         if (isDeath) return;
+
+        target = sensors.GetCurrentTarget();
+
         if (blackboard != null)
         {
             blackboard.SetNormalizedSpeed(agent.velocity.magnitude, agent.speed);
             virtualInput.LookDirection = transform.forward;
         }
 
-
-        // Ejecutar lógica continua del estado
         switch (currentState)
         {
             case EnemyState.Patrol: HandlePatrol(); break;
@@ -69,24 +63,14 @@ public class EnemyFSM : MonoBehaviour
             case EnemyState.Attack: HandleAttack(); break;
         }
 
-        HandleOffMeshLinks();
-
+        base.Update();
         CheckAttackState();
     }
     private void CheckAttackState()
     {
-        Transform target = sensors.GetPlayerTransform();
+        if (target == null) return;
         float distance = Vector3.Distance(transform.position, target.position);
         if (distance <= attackRange) ChangeState(EnemyState.Attack);
-    }
-
-    public void ChangeState(EnemyState newState)
-    {
-        if (newState == currentState) return;
-
-        ExitState(currentState);
-        currentState = newState;
-        EnterState(currentState);
     }
 
     private void EnterState(EnemyState state)
@@ -118,32 +102,17 @@ public class EnemyFSM : MonoBehaviour
         agent.speed = patrolSpeed;
         timer = wanderTimer; //Forzar que busque un punto inmediatamente
     }
-    private void OnPatrolExit()
-    {
-
-    }
     private void OnSearchEnter()
     {
         blackboard.TriggerSearch(true);
         agent.isStopped = true;
         rotatedSum = 0f;
     }
-    private void OnSearchExit()
-    {
-        rotatedSum = 0f;
-        blackboard.TriggerSearch(false);
-    }
     private void OnChaseEnter()
     {
         agent.ResetPath();
         agent.speed = chaseSpeed;
         agent.isStopped = false;
-    }
-
-    //EXITS (cuando el enemigo sale del extado x)
-    private void OnChaseExit()
-    {
-
     }
     private void OnAttackEnter()
     {
@@ -153,6 +122,15 @@ public class EnemyFSM : MonoBehaviour
         virtualInput.IsAiming = true;
         blackboard.TriggerAttack(true);
     }
+
+    //EXITS (cuando el enemigo sale del extado x)
+    private void OnPatrolExit(){}
+    private void OnSearchExit()
+    {
+        rotatedSum = 0f;
+        blackboard.TriggerSearch(false);
+    }
+    private void OnChaseExit() {}
     private void OnAttackExit()
     {
         virtualInput.IsShooting = false;
@@ -194,21 +172,7 @@ public class EnemyFSM : MonoBehaviour
 
     private void HandleChase()
     {
-        Transform target = sensors.GetPlayerTransform();
-        if (target == null) 
-        {
-            if (forceChase)
-            {
-                GameObject player = GameObject.FindGameObjectWithTag("Player");
-                if (player != null) target = player.transform;
-            }
-            else
-            {
-                ChangeState(EnemyState.Search);
-                return;
-            }
-        }
-
+        if (target == null) { ChangeState(EnemyState.Search); return; }
         agent.SetDestination(target.position);
 
         float distance = Vector3.Distance(transform.position, target.position);
@@ -218,8 +182,7 @@ public class EnemyFSM : MonoBehaviour
 
     private void HandleAttack()
     {
-        Transform target = sensors.GetPlayerTransform();
-        if (target == null) { ChangeState(EnemyState.Search); return; }
+        if (target == null) { ChangeState(EnemyState.Patrol); return; }
 
         //Smoothly rotate toward target
         Vector3 direction = (target.position - transform.position).normalized;
@@ -232,17 +195,49 @@ public class EnemyFSM : MonoBehaviour
         if (distance > attackRange+ 0.25f) ChangeState(EnemyState.Chase); //leave some margin
     }
 
- 
-    private void HandleOffMeshLinks()
+    protected override void OnHurtBehavior(Vector2 health, Vector2 shield)
     {
-        if (agent.isOnOffMeshLink)
-        {
-            if (blackboard != null) blackboard.TriggerJump();
-            agent.CompleteOffMeshLink();
-        }
+        if (currentState != EnemyState.Chase && currentState != EnemyState.Attack) ChangeState(onHurtState);
+    }
+    protected override void OnDeathBehavior()
+    {
+        base.OnDeathBehavior();
+        if (flying) GetComponent<Animator>().applyRootMotion = false;
     }
 
-    public void TriggerEnemyFootstep() => blackboard.TriggerFootstep(); 
+    //Función auxiliar para encontrar un punto válido en el NavMesh
+    private Vector3 RandomNavSphere(Vector3 origin, float dist, int layermask)
+    {
+        Vector3 randomDirection = UnityEngine.Random.insideUnitSphere * dist;
+        randomDirection += origin;
+
+
+        NavMeshHit navHit;
+        //Busca el punto válido más cercano dentro de la distancia especificada
+        if (NavMesh.SamplePosition(randomDirection, out navHit, dist, layermask)) return navHit.position;
+
+        //Si por algún motivo falla, se queda donde está
+        return origin;
+    }
+
+    //El spawner llamará aquí nada más crear al zombie para decirle cómo de rápido es
+    public void SetupSpeeds(float walkSpeed, float runSpeed)
+    {
+        patrolSpeed = walkSpeed;
+        chaseSpeed = runSpeed;
+
+        agent.speed = patrolSpeed;
+    }
+
+    public void ChangeState(EnemyState newState)
+    {
+        if (newState == currentState) return;
+
+        ExitState(currentState);
+        currentState = newState;
+        EnterState(currentState);
+    }
+
 
     private void OnDrawGizmosSelected()
     {
@@ -272,69 +267,4 @@ public class EnemyFSM : MonoBehaviour
         }
     }
 
-    //EVENTOS
-    private void OnEnable() 
-    {
-        if (blackboard != null)
-        {
-            blackboard.OnHurt += OnHurtBehavior;
-            blackboard.OnDeath += OnDeathBehavior;
-        }
-    }
-    private void OnDisable()
-    {
-        if (blackboard != null)
-        {
-            blackboard.OnHurt -= OnHurtBehavior;
-            blackboard.OnDeath -= OnDeathBehavior;
-        }
-    }
-    private void OnHurtBehavior(Vector2 health, Vector2 shield)
-    {
-        if (currentState != EnemyState.Chase && currentState != EnemyState.Attack)
-            ChangeState(onHurtState);
-    }
-    private void OnDeathBehavior()
-    {
-        isDeath = true;
-
-        //Detener física
-        if (agent != null)
-        {
-            agent.isStopped = true;
-            agent.enabled = false;
-        }
-
-        //solo para que puedan caer los enemigos voladores, si no, sobreescribe la física
-        if (flying) GetComponent<Animator>().applyRootMotion = false;
-
-        //Desactivar Colision
-        if (TryGetComponent<Collider>(out var col)) col.enabled = false;
-
-        enabled = false;
-    }
-
-    //Función auxiliar para encontrar un punto válido en el NavMesh
-    private Vector3 RandomNavSphere(Vector3 origin, float dist, int layermask)
-    {
-        Vector3 randomDirection = UnityEngine.Random.insideUnitSphere * dist;
-        randomDirection += origin;
-
-
-        NavMeshHit navHit;
-        //Busca el punto válido más cercano dentro de la distancia especificada
-        if (NavMesh.SamplePosition(randomDirection, out navHit, dist, layermask)) return navHit.position;
-
-        //Si por algún motivo falla, se queda donde está
-        return origin;
-    }
-
-    //El spawner llamará aquí nada más crear al zombie para decirle cómo de rápido es
-    public void SetupSpeeds(float walkSpeed, float runSpeed)
-    {
-        patrolSpeed = walkSpeed;
-        chaseSpeed = runSpeed;
-
-        agent.speed = patrolSpeed;
-    }
 }

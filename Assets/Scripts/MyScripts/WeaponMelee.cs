@@ -22,12 +22,14 @@ public class WeaponMelee : Weapon
 
     private void PerformMeleeCast()
     {
-        RaycastHit hit;
- 
-        if (Physics.Raycast(GetRayOrigin(), out hit, weaponInfo.meleeRange, impactLayer))
+        Ray ray = GetRayOrigin();
+        float range = weaponInfo != null ? weaponInfo.meleeRange : 3f;
+
+        if (Physics.Raycast(ray, out RaycastHit hit, range, impactLayer))
         {
             ApplyDamage(hit);
             ImpactVFX(hit);
+            return;
         }
     }
 

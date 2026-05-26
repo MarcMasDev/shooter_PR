@@ -5,20 +5,40 @@ public class EnemySensors : MonoBehaviour
     [Header("Vision Settings")]
     public float viewRadius = 15f;
     [Range(0, 360)] public float viewAngle = 90f;
-    public LayerMask targetMask; // Capa del jugador
-    public LayerMask obstacleMask; // Capa de paredes/suelo
+
+    [Tooltip("Debe incluir la capa del Player y la de los Peatones")]
+    public LayerMask targetMask; // Capa del jugador / peatones
+    public LayerMask obstacleMask; // Capa de paredes / suelo
 
     [Header("Hearing Settings")]
     public float hearingRadius = 8f;
 
-    private Transform player;
     [SerializeField] private Transform eyes;
+    private Transform currentTarget;
 
-    private void Start()
+    private void Update()
     {
-        // Asumimos que el jugador tiene el tag "Player"
-        GameObject p = GameObject.FindGameObjectWithTag("Player");
-        if (p != null) player = p.transform;
+        FindClosestTarget();
+    }
+
+    private void FindClosestTarget()
+    {
+        Collider[] targetsInRadius = Physics.OverlapSphere(transform.position, viewRadius, targetMask);
+        float minDistance = float.MaxValue;
+        Transform closest = null;
+
+        foreach (var t in targetsInRadius)
+        {
+            if (t.gameObject == gameObject) continue; // Evitar autodetectarse
+
+            float distance = Vector3.Distance(transform.position, t.transform.position);
+            if (distance < minDistance)
+            {
+                minDistance = distance;
+                closest = t.transform;
+            }
+        }
+        currentTarget = closest;
     }
 
     /// <summary>
@@ -26,26 +46,21 @@ public class EnemySensors : MonoBehaviour
     /// </summary>
     public bool CanSeePlayer()
     {
-        if (player == null) return false;
+        if (currentTarget == null) return false;
 
-        // Apunta al pecho del jugador (no a sus pies)
-        Vector3 targetPos = player.position + Vector3.up * 1.5f;
+        // Apunta al pecho del target (no a sus pies)
+        Vector3 targetPos = currentTarget.position + Vector3.up * 1.5f;
+        Vector3 dirToTarget = (targetPos - eyes.position).normalized;
+        float distanceToTarget = Vector3.Distance(eyes.position, targetPos);
 
-        Vector3 dirToPlayer = (targetPos - eyes.position).normalized;
-        float distanceToPlayer = Vector3.Distance(eyes.position, targetPos);
-
-        if (distanceToPlayer < viewRadius)
+        if (distanceToTarget < viewRadius)
         {
-            if (Vector3.Angle(transform.forward, dirToPlayer) < viewAngle / 2f)
+            if (Vector3.Angle(transform.forward, dirToTarget) < viewAngle / 2f)
             {
-                Vector3 flatDirToPlayer = new Vector3(dirToPlayer.x, 0, dirToPlayer.z).normalized;
-                if (Vector3.Angle(transform.forward, flatDirToPlayer) < viewAngle / 2f)
+                Vector3 flatDir = new Vector3(dirToTarget.x, 0, dirToTarget.z).normalized;
+                if (Vector3.Angle(transform.forward, flatDir) < viewAngle / 2f)
                 {
-                    //DEBUG: Dibuja una línea en la ventana de escena para ver el rayo
-                    Debug.DrawRay(eyes.position, dirToPlayer * distanceToPlayer, Color.green);
-
-                    //El rayo original sigue usando dirToPlayer para ver si hay obstáculos físicos
-                    if (!Physics.Raycast(eyes.position, dirToPlayer, distanceToPlayer, obstacleMask))
+                    if (!Physics.Raycast(eyes.position, dirToTarget, distanceToTarget, obstacleMask))
                     {
                         return true;
                     }
@@ -60,11 +75,9 @@ public class EnemySensors : MonoBehaviour
     /// </summary>
     public bool CanHearPlayer()
     {
-        if (player == null) return false;
-
-        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
-        return distanceToPlayer <= hearingRadius;
+        if (currentTarget == null) return false;
+        return Vector3.Distance(transform.position, currentTarget.position) <= hearingRadius;
     }
 
-    public Transform GetPlayerTransform() => player;
+    public Transform GetCurrentTarget() => currentTarget;
 }

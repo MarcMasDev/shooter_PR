@@ -4,7 +4,8 @@ using DamageNumbersPro;
 
 public class ScoreManager : MonoBehaviour
 {
-    public static ScoreManager Instance;
+    private static ScoreManager _instance;
+    public static ScoreManager Instance { get { return _instance; } }
 
     [Header("Score")]
     [SerializeField] private DamageNumber floatingTextScore;
@@ -27,10 +28,10 @@ public class ScoreManager : MonoBehaviour
     [SerializeField] private RectTransform numberKillsSpawnPoint;
     private int currentKills = 0;
 
-
     void Awake()
     {
-        Instance = this;
+        if (_instance != null && _instance != this) Destroy(gameObject);
+        else _instance = this;
         scoreDisplayer.text = points.ToString("N0");
         killsDisplayer.text = currentKills.ToString("N0");
     }

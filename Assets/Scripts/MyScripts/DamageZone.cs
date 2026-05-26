@@ -55,7 +55,7 @@ public class DamageZone : MonoBehaviour
         if (damageable != null)
         {
             time = timeBetweenDamage;
-            ImpactResult result = damageable.TakeDamage(damage, damageVFX);
+            ImpactResult result = damageable.TakeDamage(damage, null, damageVFX);
 
             if (addPoints && result != ImpactResult.alreadyDeath) ScoreManager.Instance.AddPoints(HitboxType.Body, result == ImpactResult.death);
         }

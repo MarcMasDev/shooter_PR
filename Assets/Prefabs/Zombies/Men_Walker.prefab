@@ -1496,10 +1496,10 @@ MonoBehaviour:
   viewAngle: 90
   targetMask:
     serializedVersion: 2
-    m_Bits: 128
+    m_Bits: 640
   obstacleMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 1
   hearingRadius: 5
   eyes: {fileID: 3768334461302842650}
 --- !u!114 &4573729406228305204
@@ -1526,13 +1526,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd21a69b98d5f0d44be1cc97caa88941, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyFSM
+  blackboard: {fileID: 6083193173959341429}
   currentState: 0
   onHurtState: 1
   wanderRadius: 15
   wanderTimer: 5
   rotationSpeed: 120
   attackRange: 1.5
-  blackboard: {fileID: 6083193173959341429}
   flying: 0
   forceChase: 0
 --- !u!114 &2069199259375609300
@@ -1569,11 +1569,11 @@ MonoBehaviour:
   bloodEffect: {fileID: 1834194341294532, guid: 22915c448a4a70747825d7eb5f41c682, type: 3}
   bloodLayers:
     serializedVersion: 2
-    m_Bits: 192
+    m_Bits: 704
   vfxDestroyTime: 10
   impactLayer:
     serializedVersion: 2
-    m_Bits: 129
+    m_Bits: 641
   origin: {fileID: 8816077766342312736}
 --- !u!1 &1857922896800115519
 GameObject:
@@ -4837,7 +4837,7 @@ Transform:
   m_GameObject: {fileID: 7799862546298161185}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 1.384, z: 0.164}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

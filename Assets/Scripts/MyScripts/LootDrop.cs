@@ -30,7 +30,7 @@ public class LootDrop : MonoBehaviour
         //Comrpueba si tiene que dropear algo
         if (Random.value > m_DropChance) return;
 
-        //Pilla un item aleatorio en base a sus probabilidades
+        //Pilla un item aleatorio en base a sus probabiliAdades
         GameObject itemToDrop = GetWeightedRandomItem();
 
         if (itemToDrop != null)
