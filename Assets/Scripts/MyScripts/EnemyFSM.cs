@@ -29,7 +29,13 @@ public class EnemyFSM : AgentFSM
     private EnemyInput virtualInput;
     private EnemySensors sensors;
     [SerializeField] private bool flying = false;
+
     public bool forceChase = false;
+    [Tooltip("Put 0 for unlimited force chase")]
+    [SerializeField] private float forceChaseTimer = 0;
+    private float forceChaseInternalTimer = 0;
+
+
     private Transform target;
 
     protected override void Awake()
@@ -49,6 +55,8 @@ public class EnemyFSM : AgentFSM
 
         target = sensors.GetCurrentTarget();
 
+        if (target == null && forceChase) SetPlayerAsTarget();
+
         if (blackboard != null)
         {
             blackboard.SetNormalizedSpeed(agent.velocity.magnitude, agent.speed);
@@ -64,11 +72,15 @@ public class EnemyFSM : AgentFSM
         }
 
         base.Update();
-        CheckAttackState();
+
+        if (forceChase) ForceChace();
+        else CheckAttackState();
     }
     private void CheckAttackState()
     {
         if (target == null) return;
+        if (currentState != EnemyState.Chase && currentState != EnemyState.Attack) return;
+
         float distance = Vector3.Distance(transform.position, target.position);
         if (distance <= attackRange) ChangeState(EnemyState.Attack);
     }
@@ -121,6 +133,7 @@ public class EnemyFSM : AgentFSM
         agent.isStopped = true;
         virtualInput.IsAiming = true;
         blackboard.TriggerAttack(true);
+        ResetForceChaseVariables();
     }
 
     //EXITS (cuando el enemigo sale del extado x)
@@ -172,11 +185,19 @@ public class EnemyFSM : AgentFSM
 
     private void HandleChase()
     {
-        if (target == null) { ChangeState(EnemyState.Search); return; }
+        if (target == null) 
+        {
+            if (forceChase) SetPlayerAsTarget();
+            else
+            {
+                ChangeState(EnemyState.Search);
+                return;
+            }
+        }
         agent.SetDestination(target.position);
 
         float distance = Vector3.Distance(transform.position, target.position);
-        if (distance <= attackRange && sensors.CanSeePlayer()) ChangeState(EnemyState.Attack);
+        if (distance <= attackRange) ChangeState(EnemyState.Attack);
         else if (!sensors.CanSeePlayer() && !sensors.CanHearPlayer() && !forceChase) ChangeState(EnemyState.Search);
     }
 
@@ -192,12 +213,18 @@ public class EnemyFSM : AgentFSM
         virtualInput.IsShooting = true;
 
         float distance = Vector3.Distance(transform.position, target.position);
-        if (distance > attackRange+ 0.25f) ChangeState(EnemyState.Chase); //leave some margin
+        if (distance > attackRange+ 0.25f && !blackboard.m_IsPerformingAction) ChangeState(EnemyState.Chase); //leave some margin
     }
 
     protected override void OnHurtBehavior(Vector2 health, Vector2 shield)
     {
-        if (currentState != EnemyState.Chase && currentState != EnemyState.Attack) ChangeState(onHurtState);
+        if (currentState != EnemyState.Chase && currentState != EnemyState.Attack)
+        {
+            forceChase = (onHurtState == EnemyState.Chase);
+            if(forceChase && target == null) SetPlayerAsTarget();
+
+            ChangeState(onHurtState);
+        }
     }
     protected override void OnDeathBehavior()
     {
@@ -267,4 +294,24 @@ public class EnemyFSM : AgentFSM
         }
     }
 
+    private void ForceChace()
+    {
+        if (target == null) SetPlayerAsTarget();
+        if (currentState != EnemyState.Chase) ChangeState(EnemyState.Chase);
+        if (forceChaseTimer > 0)
+        {
+            forceChaseInternalTimer += Time.deltaTime;
+
+            if (forceChaseInternalTimer > forceChaseTimer) ResetForceChaseVariables();
+        }
+    }
+    private void SetPlayerAsTarget()
+    {
+        target = GameManager.Instance.GetPlayerTransform();
+    }
+    private void ResetForceChaseVariables()
+    {
+        forceChaseInternalTimer = 0;
+        forceChase = false;
+    }
 }

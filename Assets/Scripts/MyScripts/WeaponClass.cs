@@ -18,7 +18,9 @@ public class WeaponClass : ScriptableObject
     [ShowIf("isMelee")]
     [BoxGroup("Melee Settings")]
     public float meleeRange = 2.5f;
-
+    [ShowIf("isMelee")]
+    [BoxGroup("Melee Settings")]
+    public float meleeRadius = 0.5f;
 
     // RANGED
 
