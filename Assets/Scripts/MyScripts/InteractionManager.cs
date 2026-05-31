@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
+using System.Collections.Generic;
 public interface IInteractable
 {
     bool Interact(GameObject user);
@@ -7,48 +9,95 @@ public interface IInteractable
 }
 public class InteractionManager : MonoBehaviour
 {
-    private IEntityInput input;
     private IInteractable currentInteractable;
     [SerializeField] private InteractUI interactUI;
 
+    //New Input System
+    private PlayerInput m_PlayerInput;
+    private InputAction m_interact;
+
+    //Seguimiento de todos los elementos interactivos que se encuentran dentro de la activación
+    private List<IInteractable> nearbyInteractables = new List<IInteractable>();
     private void Awake()
     {
-        input = GetComponent<IEntityInput>();
+        m_PlayerInput = GetComponent<PlayerInput>();
     }
-
+    private void Start()
+    {
+        //Cache the input actions by name
+        m_interact = m_PlayerInput.actions["Interact"];
+    }
     private void Update()
     {
-        if (currentInteractable != null)
+        UpdateClosestInteractable();
+
+        if (m_interact.triggered && currentInteractable != null) HandleInteraction();
+
+        if (currentInteractable != null) interactUI.Show(currentInteractable.GetInteractionText());
+        else interactUI.Show("");
+    }
+    private void UpdateClosestInteractable()
+    {
+        if (nearbyInteractables.Count == 0)
         {
-            interactUI.Show(currentInteractable.GetInteractionText());
+            currentInteractable = null;
+            return;
+        }
 
-            if (input.IsInteracting)
+        IInteractable closest = null;
+        float minDistance = float.MaxValue;
+        Vector3 playerPosition = transform.position;
+
+        for (int i = nearbyInteractables.Count - 1; i >= 0; i--)
+        {
+            MonoBehaviour interactableMono = nearbyInteractables[i] as MonoBehaviour;
+
+            if (interactableMono == null)
             {
-                //Intentamos interactuar y guardamos si funciona
-                bool success = currentInteractable.Interact(gameObject);
+                nearbyInteractables.RemoveAt(i);
+                continue;
+            }
 
-                if (success)
-                {
-                    interactUI.Show(""); // Ocultar solo si funciona
-                    currentInteractable = null;
-                }
-                else interactUI.ShowTooltip("Not available");
+            float distanceSqr = (interactableMono.transform.position - playerPosition).sqrMagnitude;
+            if (distanceSqr < minDistance)
+            {
+                minDistance = distanceSqr;
+                closest = nearbyInteractables[i];
             }
         }
-        else interactUI.Show(""); //hide
 
+        currentInteractable = closest;
     }
 
+
+    private void HandleInteraction()
+    {
+        print("interact");
+        //Intentamos interactuar y guardamos si funciona
+        bool success = currentInteractable.Interact(gameObject);
+
+        if (success)
+        {
+            interactUI.Show(""); // Ocultar solo si funciona
+            currentInteractable = null;
+        }
+        else interactUI.ShowTooltip("Not available");
+    }
     private void OnTriggerEnter(Collider other)
     {
-        currentInteractable = other.GetComponent<IInteractable>();
+        IInteractable interactable = other.GetComponent<IInteractable>();
+        if (interactable != null && !nearbyInteractables.Contains(interactable))
+        {
+            nearbyInteractables.Add(interactable);
+        }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.GetComponent<IInteractable>() == currentInteractable)
+        IInteractable interactable = other.GetComponent<IInteractable>();
+        if (interactable != null)
         {
-            currentInteractable = null;
+            nearbyInteractables.Remove(interactable);
         }
     }
 }

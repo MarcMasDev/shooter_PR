@@ -7,7 +7,7 @@ public enum ImpactResult
 }
 public interface IDamageable
 {
-    ImpactResult TakeDamage(float amount, GameObject attacker = null, GameObject deathFX = null);
+    ImpactResult TakeDamage(float amount, GameObject deathFX = null);
 }
 public class EntityHealth : MonoBehaviour, IDamageable
 {
@@ -16,9 +16,6 @@ public class EntityHealth : MonoBehaviour, IDamageable
     [SerializeField] private float maxShield = 100f;
     [SerializeField] private float startShield = 100f;
     [SerializeField] [Range(0,1)] private float shieldProtection = 0.75f;
-
-    private GameObject lastAttacker;
-    public bool WasKilledByZombie { get; private set; }
 
 
     private RagdollAgent ragdoll;
@@ -33,10 +30,9 @@ public class EntityHealth : MonoBehaviour, IDamageable
         Heal(maxHealth, startShield); //Updates UI and sets init values
     }
 
-    public ImpactResult TakeDamage(float amount, GameObject attacker = null, GameObject deathFX = null)
+    public ImpactResult TakeDamage(float amount, GameObject deathFX = null)
     {
         if (currentHealth <= 0) return ImpactResult.alreadyDeath;
-        lastAttacker = attacker;
 
         float damageToShield = amount * shieldProtection;
         float damageToHealth = amount - damageToShield;
@@ -76,9 +72,7 @@ public class EntityHealth : MonoBehaviour, IDamageable
     }
     private void Die()
     {
-        WasKilledByZombie = lastAttacker != null && lastAttacker.CompareTag("Enemy"); //Evaluamos si el último que le hizo daño era un zombie
-
-        m_StateBlackboard.TriggerDeath();
+        if (m_StateBlackboard != null) m_StateBlackboard.TriggerDeath();
 
         if (ragdoll != null) ragdoll.EnableRagdoll();
     }

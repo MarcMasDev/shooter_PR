@@ -40,7 +40,7 @@ public class ZombieSpawner : Spawner
     {
         if (activeEntitiesCount < maxActiveEntities)
         {
-            OnEntityInstantiated(position);
+            //OnEntityInstantiated(position);
             activeEntitiesCount++;
         }
     }

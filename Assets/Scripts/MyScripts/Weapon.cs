@@ -27,7 +27,7 @@ public abstract class Weapon : MonoBehaviour
 
     protected float nextFireTime;
     protected bool isFiring;
-    private bool isPlayer => transform.root.CompareTag("Player");
+    private bool isPlayer => CompareTag("Player");
     public virtual void TryShoot(bool initCooldown = false)
     {
         if (weaponInfo == null || m_StateBlackboard.m_IsPerformingAction) return;
@@ -70,7 +70,7 @@ public abstract class Weapon : MonoBehaviour
         IDamageable damageable = hit.collider.GetComponentInParent<IDamageable>();
         if (damageable != null)
         {
-            ImpactResult result = damageable.TakeDamage(damage, transform.root.gameObject);
+            ImpactResult result = damageable.TakeDamage(damage);
 
             if (isPlayer && result != ImpactResult.alreadyDeath) ScoreManager.Instance.AddPoints(hitbox, result == ImpactResult.death);
         }

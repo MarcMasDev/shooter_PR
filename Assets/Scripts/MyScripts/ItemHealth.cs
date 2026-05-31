@@ -1,13 +1,14 @@
 using UnityEngine;
 using UnityEngine.Audio;
 
-public class ItemHealth : MonoBehaviour, IInteractable
+public class ItemHealth : PurchasableInteractable
 {
-    [SerializeField] private string interactString = "Restore: ";
+    [Header("Health Settings")]
     [SerializeField] private float healAmount = 25f;
     [SerializeField] private float shieldAmount = 25f;
     [SerializeField] private AudioSource audioSource;
-    public bool Interact(GameObject user)
+
+    protected override bool ExecuteInteraction(GameObject user)
     {
         EntityHealth health = user.GetComponent<EntityHealth>();
         if (health == null) return false;
@@ -18,7 +19,10 @@ public class ItemHealth : MonoBehaviour, IInteractable
         if (healAmount > 0) ApplyHealth(health);
         if (shieldAmount > 0) ApplyShield(health);
 
-        if (startHealth != healAmount ||  startShield != shieldAmount) if (audioSource != null) audioSource.Play();
+        if (startHealth != healAmount || startShield != shieldAmount)
+        {
+            if (audioSource != null) audioSource.Play();
+        }
 
         bool consumed = healAmount <= 0 && shieldAmount <= 0;
         if (consumed) Destroy(gameObject);
@@ -29,52 +33,39 @@ public class ItemHealth : MonoBehaviour, IInteractable
     private void ApplyHealth(EntityHealth health)
     {
         Vector2 healthData = health.GetCurrentAndMaxHealth();
-        float currentHealth = healthData.x;
-        float maxHealth = healthData.y;
-
-        // Cuanto necesitamos? max - current
-        float neededHealth = maxHealth - currentHealth;
+        float neededHealth = healthData.y - healthData.x;
 
         if (neededHealth > 0)
         {
-            // Pilla el valor más bajo: lo que tiene el item vs lo que necesita el jugador
             int amountToGive = Mathf.RoundToInt(Mathf.Min(healAmount, neededHealth));
-
-            health.Heal(amountToGive, 0); // Aplicar al jugador
-            healAmount -= amountToGive;   // Restar del item
+            health.Heal(amountToGive, 0);
+            healAmount -= amountToGive;
         }
     }
 
     private void ApplyShield(EntityHealth health)
     {
         Vector2 shieldData = health.GetCurrentAndMaxShield();
-        float currentShield = shieldData.x;
-        float maxShield = shieldData.y;
-
-        // Cuanto necesitamos? max - current (Corregido: antes tenías x - y)
-        float neededShield = maxShield - currentShield;
+        float neededShield = shieldData.y - shieldData.x;
 
         if (neededShield > 0)
         {
-            // Pilla el valor más bajo: lo que tiene el item vs lo que necesita el jugador
             int amountToGive = Mathf.RoundToInt(Mathf.Min(shieldAmount, neededShield));
-
-            health.Heal(0, amountToGive); // Aplicar al jugador
-            shieldAmount -= amountToGive; // Restar del item
+            health.Heal(0, amountToGive);
+            shieldAmount -= amountToGive;
         }
     }
 
-    public string GetInteractionText()
+    public override string GetInteractionText()
     {
-        string text = interactString;
-        if (healAmount > 0)
+        string extraInfo = "";
+        if (healAmount > 0) extraInfo += $"{healAmount} HP ";
+        if (shieldAmount > 0) extraInfo += $"{shieldAmount} Shield";
+
+        if (Cost > 0)
         {
-            text += healAmount + " health ";
+            return $"{BaseInteractString} {extraInfo} [Cost: {Cost}]";
         }
-        if (shieldAmount > 0)
-        {
-            text += shieldAmount + " shield ";
-        }
-        return text;
+        return $"{BaseInteractString} {extraInfo}";
     }
 }

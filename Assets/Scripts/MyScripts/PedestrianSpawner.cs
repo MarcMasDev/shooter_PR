@@ -8,7 +8,8 @@ public class PedestrianSpawner : Spawner
 
     [Header("Infection Config")]
     [SerializeField] private ZombieSpawner zombieSpawner;
-
+    [SerializeField] private float infectionRadius = 5f;
+    [SerializeField] private LayerMask zombieMask;
     protected override float GetCalculatedDelay() => Random.Range(initialSpawnDelay, initialSpawnDelay * 1.5f);
 
     protected override GameObject OnEntityInstantiated(Vector3 position)
@@ -37,13 +38,7 @@ public class PedestrianSpawner : Spawner
 
             if (pedestrianInstance != null && zombieSpawner != null)
             {
-                //Buscamos el componente de salud para verificar la causa
-                EntityHealth health = pedestrianInstance.GetComponent<EntityHealth>();
-
-                if (health != null && health.WasKilledByZombie)
-                {
-                    StartCoroutine(DelayedZombieConversion(pedestrianInstance));//spawn a zombie, solo cuando lo mata un zombie
-                }
+                StartCoroutine(DelayedZombieConversion(pedestrianInstance));//spawn a zombie, solo cuando lo mata un zombie
             }
 
             blackboard.OnDeath -= deathAction;
@@ -54,9 +49,9 @@ public class PedestrianSpawner : Spawner
     private IEnumerator DelayedZombieConversion(GameObject pedestrianInstance)
     {
         int duration = pedestrianInstance.GetComponent<RagdollAgent>().ragdollDestroyTime;
-        
+
         //Wait for the ragdoll physics to finish playing out
-        yield return new WaitForSeconds(duration - 0.1f); //this gives margin so it spawns before destroying
+        yield return new WaitForSeconds(duration - 0.1f);
 
         //Double check the object wasn't cleaned up by something else in the meantime
         if (pedestrianInstance != null)
@@ -64,8 +59,10 @@ public class PedestrianSpawner : Spawner
             //Grabs the final resting place of the ragdoll
             Vector3 conversionPosition = pedestrianInstance.transform.position;
 
-            //Spawn the zombie at the dead body's feet
-            zombieSpawner.SpawnZombieAtPosition(conversionPosition);
+            bool zombieNearby = Physics.CheckSphere(conversionPosition, infectionRadius, zombieMask);
+
+            //Spawn the zombie at the dead body's feet only if a zombie is near (eating the body)
+            if (zombieNearby) zombieSpawner.SpawnZombieAtPosition(conversionPosition);
         }
     }
 }

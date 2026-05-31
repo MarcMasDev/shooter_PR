@@ -1,109 +1,78 @@
 ﻿using UnityEngine;
-using System.Collections;
 using UnityEngine.AI;
 
-public class AutomaticDoors : MonoBehaviour
+public class AutomaticDoors : PurchasableInteractable
 {
+    [Header("Door Identification")]
+    public string doorID;
+
+    [Header("Door Moving Parts")]
     public Transform leftDoor;
     public Transform rightDoor;
     public Transform leftClosedLocation;
     public Transform rightClosedLocation;
     public Transform leftOpenLocation;
     public Transform rightOpenLocation;
-
     public float speed = 1.0f;
-    public string doorID;
-    public GameObject keyNeeded;
 
-    bool isOpening = false;
-    bool isClosing = false;
-    bool enableNavmesh = false;
-    bool hasBeenUnlocked = false;
-    Vector3 distance;
+    private bool hasKey = false;
+    private bool isOpening = false;
+    private bool hasBeenPurchased = false;
+    private Vector3 distance;
 
-    private void OnEnable()
-    {
-        Key.OnKeyCollected += HandleKeyCollected;
-    }
+    private void OnEnable() => Key.OnKeyCollected += HandleKeyCollected;
+    private void OnDisable() => Key.OnKeyCollected -= HandleKeyCollected;
 
-    private void OnDisable()
-    {
-        Key.OnKeyCollected -= HandleKeyCollected;
-    }
     private void HandleKeyCollected(string id)
     {
-        if (id == doorID) hasBeenUnlocked = true;
+        if (id == doorID) hasKey = true;
     }
 
-    void Update ()
+    protected override bool PreConditionMet(GameObject user)
     {
-        if (isOpening)
-        {
-            distance = leftDoor.localPosition - leftOpenLocation.localPosition;
-            if (distance.magnitude < 0.001f)
-            {
-                isOpening = false;
-                leftDoor.localPosition = leftOpenLocation.localPosition;
-                rightDoor.localPosition = rightOpenLocation.localPosition;
-            }
-            else
-            {
-                leftDoor.localPosition = Vector3.Lerp(leftDoor.localPosition, leftOpenLocation.localPosition, Time.deltaTime * speed);
-                rightDoor.localPosition = Vector3.Lerp(rightDoor.localPosition, rightOpenLocation.localPosition, Time.deltaTime * speed);
-            }
-        }
-        else if (isClosing)
-        {
-            distance = leftDoor.localPosition - leftClosedLocation.localPosition;
-            if (distance.magnitude < 0.001f)
-            {
-                isClosing = false;
-                leftDoor.localPosition = leftClosedLocation.localPosition;
-                rightDoor.localPosition = rightClosedLocation.localPosition;
-            }
-            else
-            {
-                leftDoor.localPosition = Vector3.Lerp(leftDoor.localPosition, leftClosedLocation.localPosition, Time.deltaTime * speed);
-                rightDoor.localPosition = Vector3.Lerp(rightDoor.localPosition, rightClosedLocation.localPosition, Time.deltaTime * speed);
-            }
-        }
+        if (hasBeenPurchased) return false;
+        return hasKey;
     }
 
-    void OnTriggerEnter(Collider col)
+    protected override bool ExecuteInteraction(GameObject user)
     {
-        if (!hasBeenUnlocked)
-        {
-            if (keyNeeded != null && col.CompareTag("Player")) keyNeeded.SetActive(true);
-            return;
-        }
-
         isOpening = true;
-        isClosing = false;
+        hasBeenPurchased = true;
+
+        //Disable NavMesh obstacles so AI can walk through
+        if (leftDoor.TryGetComponent(out NavMeshObstacle leftObstacle)) leftObstacle.enabled = false;
+        if (rightDoor.TryGetComponent(out NavMeshObstacle rightObstacle)) rightObstacle.enabled = false;
+
+        //Disable this interaction collider entirely so it can't be triggered again
+        if (TryGetComponent(out Collider col)) col.enabled = false;
+
+        return true;
     }
 
-    void OnTriggerStay(Collider col)
+    //Dynamic UI Prompt management
+    public override string GetInteractionText()
     {
-        if (!hasBeenUnlocked) return;
+        if (hasBeenPurchased) return "";
 
-        isOpening = true;
-        isClosing = false;
+        if (!hasKey) return $"Locked: Requires {doorID} Key and has a cost of {Cost}";
+        return $"{BaseInteractString} [Cost: {Cost}]";
     }
 
-    void OnTriggerExit(Collider col)
+    void Update()
     {
-        if (!hasBeenUnlocked && col.CompareTag("Player"))
-        {
-            if(keyNeeded != null) keyNeeded.SetActive(false);
-            return;
-        }
-        if (!enableNavmesh)
-        {
-            enableNavmesh = true;
-            leftDoor.GetComponent<NavMeshObstacle>().enabled = false;
-            rightDoor.GetComponent<NavMeshObstacle>().enabled = false;
-        }
+        if (!isOpening) return;
 
-        isClosing = true;
-        isOpening = false;
+        distance = leftDoor.localPosition - leftOpenLocation.localPosition;
+        if (distance.magnitude < 0.001f)
+        {
+            isOpening = false;
+            leftDoor.localPosition = leftOpenLocation.localPosition;
+            rightDoor.localPosition = rightOpenLocation.localPosition;
+        }
+        else
+        {
+            leftDoor.localPosition = Vector3.Lerp(leftDoor.localPosition, leftOpenLocation.localPosition, Time.deltaTime * speed);
+            rightDoor.localPosition = Vector3.Lerp(rightDoor.localPosition, rightOpenLocation.localPosition, Time.deltaTime * speed);
+        }
     }
 }
