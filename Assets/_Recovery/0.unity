@@ -294,6 +294,63 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7229904654605057706, guid: 3a9f014e254933c4dbe65bcbd5657822, type: 3}
   m_PrefabInstance: {fileID: 1492815923}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &103268089
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1349008402424608165, guid: 19fb46ba8527fd34ca3423b63c5019e5, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 4.6820307
+      objectReference: {fileID: 0}
+    - target: {fileID: 1349008402424608165, guid: 19fb46ba8527fd34ca3423b63c5019e5, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.03902224
+      objectReference: {fileID: 0}
+    - target: {fileID: 1349008402424608165, guid: 19fb46ba8527fd34ca3423b63c5019e5, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.6911569
+      objectReference: {fileID: 0}
+    - target: {fileID: 1349008402424608165, guid: 19fb46ba8527fd34ca3423b63c5019e5, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: -0.13052607
+      objectReference: {fileID: 0}
+    - target: {fileID: 1349008402424608165, guid: 19fb46ba8527fd34ca3423b63c5019e5, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1349008402424608165, guid: 19fb46ba8527fd34ca3423b63c5019e5, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.99144495
+      objectReference: {fileID: 0}
+    - target: {fileID: 1349008402424608165, guid: 19fb46ba8527fd34ca3423b63c5019e5, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1349008402424608165, guid: 19fb46ba8527fd34ca3423b63c5019e5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1349008402424608165, guid: 19fb46ba8527fd34ca3423b63c5019e5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -195
+      objectReference: {fileID: 0}
+    - target: {fileID: 1349008402424608165, guid: 19fb46ba8527fd34ca3423b63c5019e5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1744945411645827202, guid: 19fb46ba8527fd34ca3423b63c5019e5, type: 3}
+      propertyPath: m_Name
+      value: Men_Walker (1)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 19fb46ba8527fd34ca3423b63c5019e5, type: 3}
 --- !u!1 &119077438
 GameObject:
   m_ObjectHideFlags: 0
@@ -1715,7 +1772,7 @@ Transform:
   m_GameObject: {fileID: 375934474}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.5011697, y: 1.7250001, z: -2.0200508}
+  m_LocalPosition: {x: -0.5011697, y: 0.595, z: -2.0200508}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2527,7 +2584,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8944336655422409503, guid: f6d148d888ffbf54b9afe9936dfaec1f, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.575
+      value: 0.44500005
       objectReference: {fileID: 0}
     - target: {fileID: 8944336655422409503, guid: f6d148d888ffbf54b9afe9936dfaec1f, type: 3}
       propertyPath: m_LocalPosition.z
@@ -9613,7 +9670,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1360561469
 Transform:
   m_ObjectHideFlags: 0
@@ -9733,8 +9790,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c6cc9f78647f6184a9b90a839dc8a1e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  initialSpawn: 3
-  maxActiveEntities: 10
+  initialSpawn: 1
+  maxActiveEntities: 1
   initialSpawnDelay: 4
   minimumSpawnDelay: 0.6
   minSpawnDistanceFromPlayer: 15
@@ -9747,10 +9804,10 @@ MonoBehaviour:
     earlyChance: 50
     lateChance: 50
   zombieSpawner: {fileID: 1360561470}
-  infectionRadius: 2
+  infectionRadius: 5
   zombieMask:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 0
 --- !u!1 &1394638047
 GameObject:
   m_ObjectHideFlags: 0
@@ -10892,7 +10949,7 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: 37d80d5ca367ac04aab679d0d48f9c02, type: 2}
     - target: {fileID: 7562496531895424382, guid: b9ce474cea0986f449b50179a0866220, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 8.07
+      value: 6.7685137
       objectReference: {fileID: 0}
     - target: {fileID: 7562496531895424382, guid: b9ce474cea0986f449b50179a0866220, type: 3}
       propertyPath: m_LocalPosition.y
@@ -10900,7 +10957,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7562496531895424382, guid: b9ce474cea0986f449b50179a0866220, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 1.83
+      value: 4.6330137
       objectReference: {fileID: 0}
     - target: {fileID: 7562496531895424382, guid: b9ce474cea0986f449b50179a0866220, type: 3}
       propertyPath: m_LocalRotation.w
@@ -11619,7 +11676,7 @@ Transform:
   m_GameObject: {fileID: 974238578520724216}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 0.2588191, z: -0, w: 0.9659258}
-  m_LocalPosition: {x: 0, y: 0.2, z: 0}
+  m_LocalPosition: {x: 0, y: -0.92999995, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -11689,8 +11746,8 @@ MonoBehaviour:
   JumpTimeout: 0.3
   FallTimeout: 0.15
   Grounded: 1
-  GroundedOffset: 0.1
-  GroundedRadius: 0.3
+  GroundedOffset: -0.14
+  GroundedRadius: 0.28
   GroundLayers:
     serializedVersion: 2
     m_Bits: 513
@@ -11962,7 +12019,7 @@ Transform:
   m_GameObject: {fileID: 3203261901846954287}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1.4162993, y: 1.575, z: -3.8011014}
+  m_LocalPosition: {x: -1.4162993, y: 0.44500005, z: -3.8011014}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -12239,7 +12296,6 @@ MonoBehaviour:
   maxShield: 100
   startShield: 0
   shieldProtection: 0.75
-  givePoints: 0
 --- !u!114 &7018120648229550095
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12294,3 +12350,4 @@ SceneRoots:
   - {fileID: 1492815923}
   - {fileID: 483539948}
   - {fileID: 181414211}
+  - {fileID: 103268089}

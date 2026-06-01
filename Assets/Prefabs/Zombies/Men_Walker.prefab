@@ -1453,6 +1453,7 @@ MonoBehaviour:
   maxShield: 0
   startShield: 0
   shieldProtection: 0.75
+  givePoints: 1
 --- !u!114 &6083193173959341429
 MonoBehaviour:
   m_ObjectHideFlags: 0

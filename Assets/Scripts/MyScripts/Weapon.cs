@@ -70,9 +70,9 @@ public abstract class Weapon : MonoBehaviour
         IDamageable damageable = hit.collider.GetComponentInParent<IDamageable>();
         if (damageable != null)
         {
-            ImpactResult result = damageable.TakeDamage(damage);
+            Impact result = damageable.TakeDamage(damage);
 
-            if (isPlayer && result != ImpactResult.alreadyDeath) ScoreManager.Instance.AddPoints(hitbox, result == ImpactResult.death);
+            if (isPlayer && result.givePoints) ScoreManager.Instance.AddPoints(HitboxType.Body, result.impactResult == ImpactResult.death);
         }
     }
 

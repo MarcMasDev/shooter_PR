@@ -28,7 +28,7 @@ public class ZombieSpawner : Spawner
 
         GameObject newZombie = GetRandomZombieByWeight(position);
         if (newZombie == null) return null;
-
+        
         SetZombieSpeed(newZombie);
         SetZombieDeath(newZombie.GetComponent<CharacterBlackboard>());
 
@@ -36,12 +36,12 @@ public class ZombieSpawner : Spawner
     }
 
     //Metodo para spawnear un zombie cuando hay un pederastian que es comido
-    public void SpawnZombieAtPosition(Vector3 position)
+    public void SpawnZombieAtPosition(Vector3 position,bool surprassEntityMax = false)
     {
-        if (activeEntitiesCount < maxActiveEntities)
+        if (activeEntitiesCount < maxActiveEntities || surprassEntityMax)
         {
-            //OnEntityInstantiated(position);
-            activeEntitiesCount++;
+            print("SPAWN");
+            SpawnEntity(position);
         }
     }
 

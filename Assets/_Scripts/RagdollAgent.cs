@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -6,8 +7,8 @@ public class RagdollAgent : MonoBehaviour
     private Animator animator;
     private NavMeshAgent agent;
     private Rigidbody[] ragdollBodies;
-    public int ragdollDestroyTime = 5;
-
+    [SerializeField] private int ragdollDestroyTime = 5;
+    public Action<Vector3> OnRagdollCleanup;
     private void Awake()
     {
         animator = GetComponent<Animator>();
@@ -35,6 +36,13 @@ public class RagdollAgent : MonoBehaviour
             rb.isKinematic = false;
         }
 
-        Destroy(gameObject, ragdollDestroyTime);
+        Invoke(nameof(Cleanup), ragdollDestroyTime);
+    }
+    private void Cleanup()
+    {
+        //Saber dónde esta muriendo
+        OnRagdollCleanup?.Invoke(transform.position);
+
+        Destroy(gameObject);
     }
 }

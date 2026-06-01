@@ -33,7 +33,7 @@ public abstract class Spawner : MonoBehaviour
     {
         player = GameManager.Instance.GetPlayerTransform();
 
-        for (int i = 0; i < initialSpawn; i++) SpawnEntity();
+        for (int i = 0; i < initialSpawn; i++) SpawnEntity(GetSpawnPos());
         StartCoroutine(SpawnRoutine());
     }
 
@@ -41,17 +41,18 @@ public abstract class Spawner : MonoBehaviour
     {
         while (true)
         {
-            if (activeEntitiesCount < maxActiveEntities) SpawnEntity();
+            if (activeEntitiesCount < maxActiveEntities) SpawnEntity(GetSpawnPos());
             yield return new WaitForSeconds(GetCalculatedDelay());
         }
     }
-    protected void SpawnEntity()
+
+    protected void SpawnEntity(Vector3 spawnPos)
     {
-        if (NavMesh.SamplePosition(GetSpawnPos(), out NavMeshHit hit, 10f, NavMesh.AllAreas))
-        {
-            GameObject newEntity = OnEntityInstantiated(hit.position);
-            if (newEntity != null) activeEntitiesCount++;
-        }
+        spawnPos = RequestNavMeshPosition(spawnPos);
+        if (spawnPos == Vector3.zero) return;
+
+        GameObject newEntity = OnEntityInstantiated(spawnPos);
+        if (newEntity != null) activeEntitiesCount++;
     }
     protected abstract GameObject OnEntityInstantiated(Vector3 position);
     protected abstract float GetCalculatedDelay();
@@ -64,6 +65,20 @@ public abstract class Spawner : MonoBehaviour
         float randomDistance = Random.Range(minSpawnDistanceFromPlayer, maxSpawnDistanceFromPlayer);
         return player.position + (randomDir * randomDistance);
     }
+
+    /// <summary>
+    /// Centralized safety net. Pasa cualquier vector y obtiene una coordenada NavMesh.
+    /// </summary>
+    public Vector3 RequestNavMeshPosition(Vector3 targetPosition, float searchRadius = 4f)
+    {
+        if (NavMesh.SamplePosition(targetPosition, out NavMeshHit hit, searchRadius, NavMesh.AllAreas))
+        {
+            return hit.position;
+        }
+
+        return Vector3.zero;
+    }
+
     protected virtual void OnDrawGizmos()
     {
         if (player == null) return;

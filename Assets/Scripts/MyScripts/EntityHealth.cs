@@ -5,9 +5,20 @@ public enum ImpactResult
     death,
     impact
 }
+public struct Impact
+{
+    public ImpactResult impactResult;
+    public bool givePoints;
+
+    public Impact(ImpactResult impactR, bool giveP) : this()
+    {
+        impactResult = impactR;
+        givePoints = giveP;
+    }
+}
 public interface IDamageable
 {
-    ImpactResult TakeDamage(float amount, GameObject deathFX = null);
+    Impact TakeDamage(float amount, GameObject deathFX = null);
 }
 public class EntityHealth : MonoBehaviour, IDamageable
 {
@@ -16,6 +27,7 @@ public class EntityHealth : MonoBehaviour, IDamageable
     [SerializeField] private float maxShield = 100f;
     [SerializeField] private float startShield = 100f;
     [SerializeField] [Range(0,1)] private float shieldProtection = 0.75f;
+    [SerializeField] private bool givePoints = false;
 
 
     private RagdollAgent ragdoll;
@@ -30,9 +42,9 @@ public class EntityHealth : MonoBehaviour, IDamageable
         Heal(maxHealth, startShield); //Updates UI and sets init values
     }
 
-    public ImpactResult TakeDamage(float amount, GameObject deathFX = null)
+    public Impact TakeDamage(float amount, GameObject deathFX = null)
     {
-        if (currentHealth <= 0) return ImpactResult.alreadyDeath;
+        if (currentHealth <= 0) return new Impact(ImpactResult.alreadyDeath, false);
 
         float damageToShield = amount * shieldProtection;
         float damageToHealth = amount - damageToShield;
@@ -58,9 +70,9 @@ public class EntityHealth : MonoBehaviour, IDamageable
         {
             if (deathFX != null) Instantiate(deathFX, transform.position, Quaternion.identity);
             Die();
-            return ImpactResult.death;
+            return new Impact(ImpactResult.death, givePoints);
         }
-        return ImpactResult.impact;
+        return new Impact(ImpactResult.impact, givePoints);
     }
 
     public void Heal(float healthAmount, float shieldAmount)

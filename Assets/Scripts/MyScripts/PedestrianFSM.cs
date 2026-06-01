@@ -38,6 +38,7 @@ public class PedestrianFSM : AgentFSM
     protected override void Update()
     {
         if (isDeath) return;
+        if (agent == null || !agent.isOnNavMesh || !agent.isActiveAndEnabled) return;
 
         if (blackboard != null)
         {
