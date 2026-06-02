@@ -2840,6 +2840,8 @@ MonoBehaviour:
   maxShield: 0
   startShield: 0
   shieldProtection: 0
+  givePoints: 0
+  vfxOffset: {x: 0, y: 0.5, z: 0}
 --- !u!114 &5806223559590870505
 MonoBehaviour:
   m_ObjectHideFlags: 0

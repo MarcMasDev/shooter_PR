@@ -8,6 +8,7 @@ public class DamageZone : MonoBehaviour
     [SerializeField] private bool addPoints = false;
     [SerializeField] private float damageOnSpeed = 0;
     [SerializeField] private GameObject damageVFX;
+    [SerializeField] private float yOffsetVFX;
 
     [SerializeField] private LayerMask targetLayers;
 
@@ -55,9 +56,16 @@ public class DamageZone : MonoBehaviour
         if (damageable != null)
         {
             time = timeBetweenDamage;
-            Impact result = damageable.TakeDamage(damage, damageVFX);
-
-            if (addPoints && result.givePoints) ScoreManager.Instance.AddPoints(HitboxType.Body, result.impactResult == ImpactResult.death);
+            Impact result = damageable.TakeDamage(damage);
+            if (result.impactResult != ImpactResult.alreadyDeath)
+            {
+                if (damageVFX != null)
+                {
+                    Vector3 finalImpact = new Vector3(other.transform.position.x, other.transform.position.y + yOffsetVFX, other.transform.position.z);
+                    Instantiate(damageVFX, finalImpact, Quaternion.identity);
+                }
+                if (addPoints && result.givePoints) ScoreManager.Instance.AddPoints(HitboxType.Body, result.impactResult == ImpactResult.death);
+            }
         }
     }
 }

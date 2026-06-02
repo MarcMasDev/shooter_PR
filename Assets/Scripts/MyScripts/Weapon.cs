@@ -25,6 +25,8 @@ public abstract class Weapon : MonoBehaviour
     [SerializeField] protected LayerMask impactLayer;
     [HideIf("isPlayer")][SerializeField] protected Transform origin;
 
+    [SerializeField] private Animator impactCrosshair;
+
     protected float nextFireTime;
     protected bool isFiring;
     private bool isPlayer => CompareTag("Player");
@@ -71,8 +73,12 @@ public abstract class Weapon : MonoBehaviour
         if (damageable != null)
         {
             Impact result = damageable.TakeDamage(damage);
-
-            if (isPlayer && result.givePoints) ScoreManager.Instance.AddPoints(HitboxType.Body, result.impactResult == ImpactResult.death);
+            if (isPlayer)
+            {
+                if (result.givePoints) ScoreManager.Instance.AddPoints(HitboxType.Body, result.impactResult == ImpactResult.death);
+                
+                AddHitmarker(result);
+            }
         }
     }
 
@@ -121,4 +127,13 @@ public abstract class Weapon : MonoBehaviour
     }
 
     public virtual void AddAmmo(int amount) { }
+
+    private void AddHitmarker(Impact result)
+    {
+        if (impactCrosshair == null || result.impactResult == ImpactResult.alreadyDeath) return;
+
+        if (!result.givePoints) impactCrosshair.Play("GreenHitmarker", 0, 0f);
+        else if (result.impactResult == ImpactResult.death) impactCrosshair.Play("RedHitmarker", 0, 0f);
+        else impactCrosshair.Play("Hitmarker", 0, 0f);
+    }
 }

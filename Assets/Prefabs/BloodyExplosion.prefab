@@ -5874,7 +5874,7 @@ ParticleSystem:
       countCurve:
         serializedVersion: 2
         minMaxState: 0
-        scalar: 75
+        scalar: 1
         minScalar: 30
         maxCurve:
           serializedVersion: 2
@@ -9798,6 +9798,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5853073388274517609}
   - component: {fileID: 2900737860862392259}
+  - component: {fileID: 7480013628350995888}
   m_Layer: 0
   m_Name: BloodyExplosion
   m_TagString: Untagged
@@ -9835,6 +9836,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e3b5c45faf4c484cb3e9f9c6ea840cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  time: 5
+--- !u!114 &7480013628350995888
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5611723683724265792}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c0eb97d77e871548828662fd0997e1c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  blastRadius: 5
+  explosionForce: 1
+  upwardsModifier: 1
+  targetLayers:
+    serializedVersion: 2
+    m_Bits: 832
 --- !u!1 &6273898429304235502
 GameObject:
   m_ObjectHideFlags: 0

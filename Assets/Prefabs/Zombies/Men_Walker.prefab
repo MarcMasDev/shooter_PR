@@ -1436,6 +1436,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   ragdollDestroyTime: 5
+  changeLayerOnDeath: 1
+  deathLayer:
+    serializedVersion: 2
+    m_Bits: 256
 --- !u!114 &2091992801576647208
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1454,6 +1458,7 @@ MonoBehaviour:
   startShield: 0
   shieldProtection: 0.75
   givePoints: 1
+  vfxOffset: {x: 0, y: 0.5, z: 0}
 --- !u!114 &6083193173959341429
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1576,6 +1581,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 640
   origin: {fileID: 8816077766342312736}
+  impactCrosshair: {fileID: 0}
 --- !u!1 &1857922896800115519
 GameObject:
   m_ObjectHideFlags: 0

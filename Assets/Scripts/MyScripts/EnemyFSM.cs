@@ -52,6 +52,7 @@ public class EnemyFSM : AgentFSM
     protected override void Update()
     {
         if (isDeath) return;
+        if (agent == null || !agent.isOnNavMesh) return;
 
         target = sensors.GetCurrentTarget();
 

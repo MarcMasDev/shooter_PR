@@ -18,7 +18,7 @@ public struct Impact
 }
 public interface IDamageable
 {
-    Impact TakeDamage(float amount, GameObject deathFX = null);
+    Impact TakeDamage(float amount);
 }
 public class EntityHealth : MonoBehaviour, IDamageable
 {
@@ -42,7 +42,7 @@ public class EntityHealth : MonoBehaviour, IDamageable
         Heal(maxHealth, startShield); //Updates UI and sets init values
     }
 
-    public Impact TakeDamage(float amount, GameObject deathFX = null)
+    public Impact TakeDamage(float amount)
     {
         if (currentHealth <= 0) return new Impact(ImpactResult.alreadyDeath, false);
 
@@ -68,7 +68,6 @@ public class EntityHealth : MonoBehaviour, IDamageable
 
         if (currentHealth <= 0)
         {
-            if (deathFX != null) Instantiate(deathFX, transform.position, Quaternion.identity);
             Die();
             return new Impact(ImpactResult.death, givePoints);
         }

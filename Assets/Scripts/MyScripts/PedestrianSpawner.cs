@@ -37,9 +37,6 @@ public class PedestrianSpawner : Spawner
         //Check if a zombie is currently eating the body at its final resting place
         bool zombieNearby = Physics.CheckSphere(finalPosition, infectionRadius, zombieMask);
 
-        if (zombieNearby)
-        {
-            zombieSpawner.SpawnZombieAtPosition(finalPosition, true);
-        }
+        if (zombieNearby) zombieSpawner.SpawnZombieAtPosition(finalPosition, true);
     }
 }
