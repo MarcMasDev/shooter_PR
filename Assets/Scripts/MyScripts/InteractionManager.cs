@@ -13,19 +13,14 @@ public class InteractionManager : MonoBehaviour
     [SerializeField] private InteractUI interactUI;
 
     //New Input System
-    private PlayerInput m_PlayerInput;
     private InputAction m_interact;
 
     //Seguimiento de todos los elementos interactivos que se encuentran dentro de la activación
     private List<IInteractable> nearbyInteractables = new List<IInteractable>();
-    private void Awake()
-    {
-        m_PlayerInput = GetComponent<PlayerInput>();
-    }
     private void Start()
     {
         //Cache the input actions by name
-        m_interact = m_PlayerInput.actions["Interact"];
+        m_interact = GameManager.Instance.GetInput().actions["Interact"];
     }
     private void Update()
     {
@@ -72,7 +67,6 @@ public class InteractionManager : MonoBehaviour
 
     private void HandleInteraction()
     {
-        print("interact");
         //Intentamos interactuar y guardamos si funciona
         bool success = currentInteractable.Interact(gameObject);
 
@@ -85,9 +79,11 @@ public class InteractionManager : MonoBehaviour
     }
     private void OnTriggerEnter(Collider other)
     {
+        print("Entered: " + other.transform.name);
         IInteractable interactable = other.GetComponent<IInteractable>();
         if (interactable != null && !nearbyInteractables.Contains(interactable))
         {
+            print("Object accepted: " + other.transform.name);
             nearbyInteractables.Add(interactable);
         }
     }

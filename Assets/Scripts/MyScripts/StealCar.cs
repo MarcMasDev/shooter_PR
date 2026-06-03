@@ -2,9 +2,12 @@ using UnityEngine;
 
 public class StealCar : PurchasableInteractable
 {
+    [SerializeField] private Transform playerPositionParent;
+
     [SerializeField] private Behaviour[] componentsAI;
     [SerializeField] private Behaviour[] componentsPlayer;
     [SerializeField] private GameObject[] gameObjectsPlayer;
+
     private bool inTheCar = false;
     private void Start()
     {
@@ -12,8 +15,11 @@ public class StealCar : PurchasableInteractable
     }
     protected override bool ExecuteInteraction(GameObject user)
     {
-        inTheCar = !inTheCar;
+        inTheCar = !inTheCar; 
+
+        GameManager.Instance.SetInteractParent(inTheCar, playerPositionParent);
         GameManager.Instance.EnablePlayer(!inTheCar);
+
         SetComponents();
 
         return true;

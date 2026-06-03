@@ -3,8 +3,6 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 #endif
 
-//He adaptado el IENtityInput para que ahora funcione con el PlayerInput (new input system component)
-[RequireComponent(typeof(PlayerInput))]
 public class WeaponInventory : MonoBehaviour
 {
     [SerializeField] private CharacterBlackboard m_StateBlackboard;
@@ -13,16 +11,10 @@ public class WeaponInventory : MonoBehaviour
     private int selectedWeaponIndex = 0;
 
     //New Input System
-    private PlayerInput m_PlayerInput;
     private InputAction m_ShootAction;
     private InputAction m_ReloadAction;
     private InputAction m_ScrollAction;
     private InputAction[] m_WeaponNumberActions;
-
-    private void Awake()
-    {
-        m_PlayerInput = GetComponent<PlayerInput>();
-    }
 
     private void OnEnable()
     {
@@ -37,14 +29,14 @@ public class WeaponInventory : MonoBehaviour
     private void Start()
     {
         //Cache the input actions by name
-        m_ShootAction = m_PlayerInput.actions["Shoot"];
-        m_ReloadAction = m_PlayerInput.actions["Reload"];
-        m_ScrollAction = m_PlayerInput.actions["Scroll"];
+        m_ShootAction = GameManager.Instance.GetInput().actions["Shoot"];
+        m_ReloadAction = GameManager.Instance.GetInput().actions["Reload"];
+        m_ScrollAction = GameManager.Instance.GetInput().actions["Scroll"];
 
         m_WeaponNumberActions = new InputAction[weapons.Length];
         for (int i = 0; i < weapons.Length; i++)
         {
-            m_WeaponNumberActions[i] = m_PlayerInput.actions[$"Weapon{i + 1}"];
+            m_WeaponNumberActions[i] = GameManager.Instance.GetInput().actions[$"Weapon{i + 1}"];
         }
 
         SwapWeapon();

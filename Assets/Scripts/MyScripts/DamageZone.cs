@@ -12,7 +12,7 @@ public class DamageZone : MonoBehaviour
 
     [SerializeField] private LayerMask targetLayers;
 
-    private Rigidbody rb;
+    [SerializeField] private Rigidbody rb;
 
     private float time = 0;
     private void OnTriggerEnter(Collider other)

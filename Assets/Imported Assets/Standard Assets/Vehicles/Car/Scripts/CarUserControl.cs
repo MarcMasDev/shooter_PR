@@ -9,11 +9,9 @@ using UnityEngine.InputSystem;
 namespace UnityStandardAssets.Vehicles.Car
 {
     [RequireComponent(typeof (CarController))]
-    [RequireComponent(typeof(PlayerInput))]
     public class CarUserControl : MonoBehaviour
     {
         private CarController m_Car; // the car controller we want to use
-        private PlayerInput m_PlayerInput;
         private InputAction m_MoveAction;
         private InputAction m_HandbrakeAction;
 
@@ -21,12 +19,12 @@ namespace UnityStandardAssets.Vehicles.Car
         {
             // get the car controller
             m_Car = GetComponent<CarController>();
-            m_PlayerInput = GetComponent<PlayerInput>();
-
-            m_MoveAction = m_PlayerInput.actions["CarMove"];
-            m_HandbrakeAction = m_PlayerInput.actions["Handbrake"];
         }
-
+        private void Start()
+        {
+            m_MoveAction = GameManager.Instance.GetInput().actions["CarMove"];
+            m_HandbrakeAction = GameManager.Instance.GetInput().actions["Handbrake"];
+        }
 
         private void FixedUpdate()
         {
@@ -49,6 +47,22 @@ namespace UnityStandardAssets.Vehicles.Car
 
             //pass the input to the car!
             m_Car.Move(h, v, v, handbrake);
+        }
+
+        private void OnEnable()
+        {
+            if (m_Car != null)
+            {
+                m_Car.IsOccupied = true;
+            }
+        }
+
+        private void OnDisable()
+        {
+            if (m_Car != null)
+            {
+                m_Car.IsOccupied = false;
+            }
         }
     }
 }

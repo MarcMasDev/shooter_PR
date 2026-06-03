@@ -36,6 +36,7 @@ namespace UnityStandardAssets.Vehicles.Car
         [SerializeField] private float m_RevRangeBoundary = 1f;
         [SerializeField] private float m_SlipLimit;
         [SerializeField] private float m_BrakeTorque;
+        [SerializeField] private float m_EngineBrakeTorque = 1000f;
 
         private Quaternion[] m_WheelMeshLocalRotations;
         private Vector3 m_Prevpos, m_Pos;
@@ -55,6 +56,25 @@ namespace UnityStandardAssets.Vehicles.Car
         public float Revs { get; private set; }
         public float AccelInput { get; private set; }
 
+        [Header("Occupancy Settings")]
+        [SerializeField] private bool m_BrakeWhenUnoccupied = true;
+        private bool m_IsOccupied = true;
+
+        public bool IsOccupied
+        {
+            get { return m_IsOccupied; }
+            set
+            {
+                m_IsOccupied = value;
+                if (!m_IsOccupied)
+                {
+                    if (m_BrakeWhenUnoccupied) BrakeFully();
+                    else ResetTorques();
+                }
+                else ResetTorques();
+            }
+        }
+
         // Use this for initialization
         private void Start()
         {
@@ -69,6 +89,12 @@ namespace UnityStandardAssets.Vehicles.Car
 
             m_Rigidbody = GetComponent<Rigidbody>();
             m_CurrentTorque = m_FullTorqueOverAllWheels - (m_TractionControl*m_FullTorqueOverAllWheels);
+
+            CarUserControl userControl = GetComponent<CarUserControl>();
+            if (userControl != null && !userControl.enabled)
+            {
+                IsOccupied = false;
+            }
         }
 
 
@@ -128,6 +154,12 @@ namespace UnityStandardAssets.Vehicles.Car
 
         public void Move(float steering, float accel, float footbrake, float handbrake)
         {
+            if (!m_IsOccupied)
+            {
+                if (m_BrakeWhenUnoccupied) BrakeFully();
+                return;
+            }
+
             for (int i = 0; i < 4; i++)
             {
                 Quaternion quat;
@@ -362,6 +394,32 @@ namespace UnityStandardAssets.Vehicles.Car
                 }
             }
             return false;
+        }
+
+        private void BrakeFully()
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                if (m_WheelColliders[i] != null)
+                {
+                    m_WheelColliders[i].motorTorque = 0f;
+                    m_WheelColliders[i].brakeTorque = m_BrakeTorque > 0 ? m_BrakeTorque : 20000f;
+                }
+            }
+            if (m_WheelColliders[2] != null) m_WheelColliders[2].brakeTorque = m_MaxHandbrakeTorque;
+            if (m_WheelColliders[3] != null) m_WheelColliders[3].brakeTorque = m_MaxHandbrakeTorque;
+        }
+
+        private void ResetTorques()
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                if (m_WheelColliders[i] != null)
+                {
+                    m_WheelColliders[i].motorTorque = 0f;
+                    m_WheelColliders[i].brakeTorque = 0f;
+                }
+            }
         }
     }
 }
