@@ -9,6 +9,7 @@ public class ScoreManager : MonoBehaviour
 
     [Header("Score")]
     [SerializeField] private DamageNumber floatingTextScore;
+    [SerializeField] private DamageNumber floatingTextDecreaseScore;
     [SerializeField] private TMP_Text scoreDisplayer;
     [SerializeField] private RectTransform numberPointsSpawnPoint;
 
@@ -60,15 +61,12 @@ public class ScoreManager : MonoBehaviour
         SpawnPoints(currentPoints);
     }
 
-    public bool CheckAndApplyAmount(int amount)
+    public bool CheckPoints(int amount) => amount <= points;
+    public void DecreasePoints(int amount)
     {
-        if (amount <= points)
-        {
-            points -= amount;
-            scoreDisplayer.text = points.ToString("N0");
-            return true;
-        }
-        return false;
+        points -= amount;
+        scoreDisplayer.text = points.ToString("N0");
+        SpawnNegativePoints(-amount);
     }
 
     public void AddKill()
@@ -81,5 +79,6 @@ public class ScoreManager : MonoBehaviour
     public int GetCurrentKills() => currentKills;
 
     private void SpawnPoints(int pointsToShow) => floatingTextScore.SpawnGUI(numberPointsSpawnPoint, Vector2.zero, pointsToShow);
+    private void SpawnNegativePoints(int pointsToShow) => floatingTextDecreaseScore.SpawnGUI(numberPointsSpawnPoint, Vector2.zero, pointsToShow);
     private void SpawnKills(int killsToShow) => floatingTextKills.SpawnGUI(numberKillsSpawnPoint, Vector2.zero, killsToShow);
 }

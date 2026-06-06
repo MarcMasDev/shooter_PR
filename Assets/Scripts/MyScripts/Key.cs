@@ -5,7 +5,6 @@ using System;
 public class Key : PurchasableInteractable
 {
     [Header("Key Settings")]
-    [SerializeField] private GameObject keyVisuals;
     [SerializeField] private string keyID;
     [SerializeField] private AudioSource audioSource;
 
@@ -14,11 +13,9 @@ public class Key : PurchasableInteractable
     protected override bool ExecuteInteraction(GameObject user)
     {
         OnKeyCollected?.Invoke(keyID);
-
-        GetComponent<Collider>().enabled = false;
-        if (keyVisuals != null) keyVisuals.SetActive(false);
         if (audioSource != null) audioSource.Play();
 
+        Destroy(gameObject);
         return true; // Return true because the key is fully consumed
     }
 }

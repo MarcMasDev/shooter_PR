@@ -45,7 +45,12 @@ public class CharacterAnimationManager : MonoBehaviour
         m_Animator.SetBool("IsAiming", m_StateBlackboard.GetAim()); 
     }
 
-    private void OnAttack(bool isFiring) => m_Animator.SetBool("Attack", isFiring);
+    private void OnAttack(bool isFiring, bool melee = false)
+    {
+        m_Animator.SetBool("Attack", isFiring);
+
+        if (melee) m_Animator.SetTrigger("MeleeAttack");
+    }
     private void Reload() => m_Animator.SetTrigger("Reload");
     private void Hide() => m_Animator.SetTrigger("Hide");
     private void Jump() => m_Animator.SetTrigger("Jump");

@@ -9,6 +9,7 @@ public class WeaponRanged : Weapon, IReloadable
     private int currentAmmo;
     private int currentClips;
     private Coroutine fireRoutine;
+    private bool waitingForRelease;
 
     private void Start()
     {
@@ -19,7 +20,7 @@ public class WeaponRanged : Weapon, IReloadable
     // El inventory lo activa cada vez que el jugador dispara
     public override void TryShoot(bool initCooldown = false)
     {
-        if (m_StateBlackboard.m_IsPerformingAction || Time.time < nextFireTime || isFiring) return;
+        if (m_StateBlackboard.m_IsPerformingAction || Time.time < nextFireTime || isFiring || waitingForRelease) return;
 
         if (initCooldown) nextFireTime = Time.time + (1f / weaponInfo.fireRate);
 
@@ -28,6 +29,7 @@ public class WeaponRanged : Weapon, IReloadable
             case FireMode.SemiAuto:
                 ExecuteAttack();
                 nextFireTime = Time.time + (1f / weaponInfo.fireRate);
+                waitingForRelease = true;
                 break;
 
             case FireMode.FullAuto:
@@ -44,6 +46,7 @@ public class WeaponRanged : Weapon, IReloadable
     public override void StopShooting()
     {
         base.StopShooting();
+        waitingForRelease = false;
 
         if (fireRoutine != null)
         {
@@ -115,15 +118,10 @@ public class WeaponRanged : Weapon, IReloadable
         if (currentClips <= 0 || currentAmmo >= weaponInfo.clipSize) return;
         StopShooting();
         DisableInput();
-
+        if (audioItems != null) AudioManager.instance.PlayOneShootFromArray(audioItems, SoundType.reload);
 
 
         m_StateBlackboard.TriggerReload();
-    }
-    public void ExecuteReloadAudio()
-    {
-        if (audioItems != null)
-            AudioManager.instance.PlayOneShootFromArray(audioItems, SoundType.reload);
     }
     public void StopReloading()
     {

@@ -7,7 +7,7 @@ public class WeaponMelee : Weapon
     protected override void ExecuteAttack()
     {        
         // No hacemos damage, esperamos a la animación...
-        m_StateBlackboard.TriggerAttack(true);
+        m_StateBlackboard.TriggerAttack(true, true);
 
         if (audioItems != null) AudioManager.instance.PlayOneShootFromArray(audioItems, SoundType.shoot);
 

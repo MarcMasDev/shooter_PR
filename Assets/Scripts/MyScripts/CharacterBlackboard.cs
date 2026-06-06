@@ -13,7 +13,7 @@ public class CharacterBlackboard : MonoBehaviour
     public event Action<Vector2, Vector2> OnHurt;
     public event Action<Vector2, Vector2> OnHeal;
     public event Action OnDeath;
-    public event Action<bool> OnAttack;
+    public event Action<bool, bool> OnAttack;
     public event Action OnReload;
     public event Action OnHide;
     public event Action OnSwapTick;
@@ -44,7 +44,7 @@ public class CharacterBlackboard : MonoBehaviour
     public void TriggerHurt(Vector2 health, Vector2 shield) => OnHurt?.Invoke(health, shield);
     public void TriggerHeal(Vector2 health, Vector2 shield) => OnHeal?.Invoke(health, shield);
     public void TriggerDeath() => OnDeath?.Invoke();
-    public void TriggerAttack(bool isFiring) => OnAttack?.Invoke(isFiring);
+    public void TriggerAttack(bool isFiring, bool melee = false) => OnAttack?.Invoke(isFiring, melee);
     public void TriggerReload() => OnReload?.Invoke();
     public void TriggerHide() => OnHide?.Invoke();
     public void TriggerSwap() => OnSwapTick?.Invoke();

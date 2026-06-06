@@ -6,12 +6,13 @@ public class PlayerHealthUI : MonoBehaviour
 {
     [SerializeField] private CharacterBlackboard m_StateBlackboard;
 
-
-    [SerializeField] private Animator m_hurtAnim;
     [SerializeField] private Slider healthSlider;
     [SerializeField] private TMP_Text healthText;
     [SerializeField] private Slider shieldSlider;
     [SerializeField] private TMP_Text shieldText;
+
+    [Tooltip("Leave empty if not player")]
+    [SerializeField] private Animator m_hurtAnim;
 
     private void OnEnable()
     {
@@ -34,7 +35,7 @@ public class PlayerHealthUI : MonoBehaviour
     }
     private void OnHurt(Vector2 health, Vector2 shield)
     {
-        m_hurtAnim.SetTrigger("Hurt");
+        if (m_hurtAnim != null) m_hurtAnim.SetTrigger("Hurt");
         UpdateHealthUI(health, shield);
     }
     private void UpdateHealthUI(Vector2 health, Vector2 shield)

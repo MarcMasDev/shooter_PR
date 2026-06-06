@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4072287004528629763}
   - component: {fileID: 7036170282614736648}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Audio Source
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -140,7 +140,7 @@ GameObject:
   - component: {fileID: 7562496531895424382}
   - component: {fileID: 8861805623817258479}
   - component: {fileID: 2863008118461626587}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: BlueKey
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -155,9 +155,9 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2159533086698108342}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: 0.7071068, z: -0, w: 0.70710677}
+  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 21.59, y: 10.87, z: 29.008}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.42548, y: 0.42548, z: 0.42548}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8574458561046283909}
@@ -197,9 +197,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5ae2e44b5d623e45b1ca4f75db93e80, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  keyVisuals: {fileID: 2307748237549530521}
-  uiKeyText: Press "E" to grab the purple door access card
-  keyID: BlueKey
+  interactString: '[E] Grab Key'
+  cost: 0
+  keyID: Keycard
   audioSource: {fileID: 7036170282614736648}
 --- !u!1 &2307748237549530521
 GameObject:
@@ -214,7 +214,7 @@ GameObject:
   - component: {fileID: 4458125910470988917}
   - component: {fileID: 2191424876972507560}
   - component: {fileID: 5870893914180917646}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: AccessCardVisuals
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -269,7 +269,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 2ed75aa837c4930429e2134487ef6710, type: 2}
+  - {fileID: 7813419849211700074, guid: 9c531f7132a5fa44a87992df50ab3582, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

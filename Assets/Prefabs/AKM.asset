@@ -15,9 +15,10 @@ MonoBehaviour:
   weaponName: AKM
   isMelee: 0
   meleeRange: 2.5
+  meleeRadius: 0.5
   fireMode: 1
   fireRate: 10
   burstCount: 3
   clipSize: 30
   maxClips: 250
-  damage: 25
+  damage: 20

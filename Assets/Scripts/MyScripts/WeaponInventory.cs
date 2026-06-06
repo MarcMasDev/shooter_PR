@@ -3,10 +3,17 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 #endif
 
+[System.Serializable]
+public struct SavedWeapon
+{
+    public Weapon weapon;
+    public Transform handPos;
+}
 public class WeaponInventory : MonoBehaviour
 {
     [SerializeField] private CharacterBlackboard m_StateBlackboard;
-    [SerializeField] private Weapon[] weapons;
+    [SerializeField] private SavedWeapon[] weapons;
+    [SerializeField] private Transform helperHand;
 
     private int selectedWeaponIndex = 0;
 
@@ -72,7 +79,11 @@ public class WeaponInventory : MonoBehaviour
             }
         }
 
-        if (previousSelectedWeapon != selectedWeaponIndex) HideWeapon();
+        if (previousSelectedWeapon != selectedWeaponIndex)
+        {
+            HideWeapon();
+            SwapWeapon();
+        }
     }
 
     private void HandleCombatInput()
@@ -96,10 +107,10 @@ public class WeaponInventory : MonoBehaviour
         m_StateBlackboard.TriggerHide();
         foreach (var weapon in weapons)
         {
-            if (weapon.gameObject.activeSelf)
+            if (weapon.weapon.gameObject.activeSelf)
             {
-                weapon.StopShooting();
-                weapon.DisableInput();
+                weapon.weapon.StopShooting();
+                weapon.weapon.DisableInput();
             }
         }
     }
@@ -108,7 +119,14 @@ public class WeaponInventory : MonoBehaviour
     {
         for (int i = 0; i < weapons.Length; i++)
         {
-            weapons[i].gameObject.SetActive(i == selectedWeaponIndex);
+            if (i == selectedWeaponIndex)
+            {
+                weapons[i].weapon.gameObject.SetActive(true);
+                weapons[i].weapon.EnableInput();
+                helperHand.localPosition = weapons[i].handPos.localPosition;
+                helperHand.localRotation = weapons[i].handPos.localRotation;
+            }
+            else weapons[i].weapon.gameObject.SetActive(false);
         }
     }
 
@@ -116,7 +134,7 @@ public class WeaponInventory : MonoBehaviour
     {
         if (selectedWeaponIndex >= 0 && selectedWeaponIndex < weapons.Length)
         {
-            return weapons[selectedWeaponIndex];
+            return weapons[selectedWeaponIndex].weapon;
         }
         return null;
     }
@@ -126,5 +144,15 @@ public class WeaponInventory : MonoBehaviour
         WeaponRanged weaponRanged = GetActiveWeapon() as WeaponRanged;
 
         if (weaponRanged != null) weaponRanged.StopReloading();
+    }
+
+    public void SetActiveWeaponHitEvent()
+    {
+        WeaponMelee weaponMelee = GetActiveWeapon() as WeaponMelee;
+        if (weaponMelee != null) weaponMelee.HitEvent();
+    }
+    public void EnableCurrentWeaponInput()
+    {
+        GetActiveWeapon().EnableInput();
     }
 }

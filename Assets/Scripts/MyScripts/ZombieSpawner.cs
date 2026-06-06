@@ -8,12 +8,6 @@ public class ZombieSpawner : Spawner
     [Header("Difficulty Modifiers")]
     [SerializeField] private int killsToReachMaxDifficulty = 100;
 
-    [Header("Speeds")]
-    [SerializeField] private float zombieWanderSpeed = 1.5f;
-    [SerializeField] private float walkerChaseSpeed = 3.5f;
-    [SerializeField] private float runnerChaseSpeed = 6.5f;
-    [SerializeField] private Vector2 randomSpeedRange = new Vector2(-0.5f, 0.5f);
-
     [Header("Runner Chances")]
     [Range(0f, 100f)][SerializeField] private float initialRunnerChance = 5f;
     [Range(0f, 100f)][SerializeField] private float maxRunnerChance = 95f;
@@ -38,11 +32,7 @@ public class ZombieSpawner : Spawner
     //Metodo para spawnear un zombie cuando hay un pederastian que es comido
     public void SpawnZombieAtPosition(Vector3 position,bool surprassEntityMax = false)
     {
-        if (activeEntitiesCount < maxActiveEntities || surprassEntityMax)
-        {
-            print("SPAWN");
-            SpawnEntity(position);
-        }
+        if (activeEntitiesCount < maxActiveEntities || surprassEntityMax) SpawnEntity(position);
     }
 
     //Para aumentar la dificultad, el sistema incluye una selección de tipos dinámica que aumenta junto con la dificultad del juego cada vez que el jugador mata a un enemigo
@@ -74,13 +64,9 @@ public class ZombieSpawner : Spawner
     {
         float currentRunnerChance = Mathf.Lerp(initialRunnerChance, maxRunnerChance, GetCurrentDifficulty);
         float randomRoll = Random.Range(0f, 100f);
-        float randomSpeed = Random.Range(randomSpeedRange.x, randomSpeedRange.y);
-        float finalChaseSpeed = zombieWanderSpeed;
 
-        if (randomRoll <= currentRunnerChance) finalChaseSpeed = runnerChaseSpeed;
-
-        EnemyFSM fsm = agent.GetComponent<EnemyFSM>();
-        if (fsm != null) fsm.SetupSpeeds(zombieWanderSpeed + randomSpeed, finalChaseSpeed + randomSpeed);
+        EnemyFSM agentFSM = agent.GetComponent<EnemyFSM>();
+        if (agentFSM) agentFSM.SetupSpeeds(randomRoll <= currentRunnerChance);
     }
 
     private void SetZombieDeath(CharacterBlackboard blackboard)

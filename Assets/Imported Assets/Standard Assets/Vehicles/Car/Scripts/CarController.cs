@@ -57,9 +57,8 @@ namespace UnityStandardAssets.Vehicles.Car
         public float AccelInput { get; private set; }
 
         [Header("Occupancy Settings")]
-        [SerializeField] private bool m_BrakeWhenUnoccupied = true;
-        private bool m_IsOccupied = true;
-
+        public bool m_BrakeWhenUnoccupied = true;
+        [HideInInspector] public bool m_IsOccupied = true;
         public bool IsOccupied
         {
             get { return m_IsOccupied; }
@@ -157,7 +156,6 @@ namespace UnityStandardAssets.Vehicles.Car
             if (!m_IsOccupied)
             {
                 if (m_BrakeWhenUnoccupied) BrakeFully();
-                return;
             }
 
             for (int i = 0; i < 4; i++)

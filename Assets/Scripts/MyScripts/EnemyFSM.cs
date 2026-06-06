@@ -23,16 +23,21 @@ public class EnemyFSM : AgentFSM
     [Header("Attack Settings")]
     public float attackRange = 10f;
 
-    private float patrolSpeed = 1.5f;
-    private float chaseSpeed = 3.5f;
+    [Header("Speeds")]
+    [SerializeField] private float patrolSpeed = 2f;
+    [SerializeField] private float chaseSpeed = 3f;
+    [SerializeField] private float runnerSpeedMultiplier = 1.5f;
+    [SerializeField] private Vector2 randomSpeedRange = new Vector2(-0.5f, 0.5f);
 
     private EnemyInput virtualInput;
     private EnemySensors sensors;
     [SerializeField] private bool flying = false;
-
     public bool forceChase = false;
+
+
     [Tooltip("Put 0 for unlimited force chase")]
     [SerializeField] private float forceChaseTimer = 0;
+    [SerializeField] private bool forceAttackToChase = false;
     private float forceChaseInternalTimer = 0;
 
 
@@ -214,7 +219,7 @@ public class EnemyFSM : AgentFSM
         virtualInput.IsShooting = true;
 
         float distance = Vector3.Distance(transform.position, target.position);
-        if (distance > attackRange+ 0.25f && !blackboard.m_IsPerformingAction) ChangeState(EnemyState.Chase); //leave some margin
+        if (distance > attackRange+ 0.25f && (!blackboard.m_IsPerformingAction || forceAttackToChase)) ChangeState(EnemyState.Chase); //leave some margin
     }
 
     protected override void OnHurtBehavior(Vector2 health, Vector2 shield)
@@ -249,10 +254,15 @@ public class EnemyFSM : AgentFSM
     }
 
     //El spawner llamará aquí nada más crear al zombie para decirle cómo de rápido es
-    public void SetupSpeeds(float walkSpeed, float runSpeed)
+    public void SetupSpeeds(bool runner)
     {
-        patrolSpeed = walkSpeed;
-        chaseSpeed = runSpeed;
+        if (!runner) runnerSpeedMultiplier = 1;
+
+        chaseSpeed *= runnerSpeedMultiplier;
+        
+        float randomSpeed = Random.Range(randomSpeedRange.x, randomSpeedRange.y);
+        chaseSpeed += randomSpeed;
+        patrolSpeed += randomSpeed;
 
         agent.speed = patrolSpeed;
     }

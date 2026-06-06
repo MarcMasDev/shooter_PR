@@ -15,16 +15,23 @@ public abstract class PurchasableInteractable : MonoBehaviour, IInteractable
 
         if (cost > 0)
         {
-            if (!ScoreManager.Instance.CheckAndApplyAmount(cost)) return false;
-        }
+            bool enoughPoints = ScoreManager.Instance.CheckPoints(cost);
+            if (!enoughPoints) return false;
 
-        return ExecuteInteraction(user);
+            bool interactionExecuted = ExecuteInteraction(user);
+            if (!interactionExecuted) return false;
+
+            ScoreManager.Instance.DecreasePoints(cost);
+        }
+        else ExecuteInteraction(user);
+
+        return true;
     }
     protected virtual bool PreConditionMet(GameObject user) => true;
 
     public virtual string GetInteractionText()
     {
-        if (cost > 0) return $"{interactString} [Cost: {cost}]";
+        if (cost > 0) return $"{interactString}: {cost} points";
         return interactString;
     }
 

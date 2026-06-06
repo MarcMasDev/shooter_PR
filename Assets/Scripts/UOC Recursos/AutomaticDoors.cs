@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Audio;
 
 public class AutomaticDoors : PurchasableInteractable
 {
@@ -13,6 +14,7 @@ public class AutomaticDoors : PurchasableInteractable
     public Transform rightClosedLocation;
     public Transform leftOpenLocation;
     public Transform rightOpenLocation;
+    public AudioSource audioSource;
     public float speed = 1.0f;
 
     private bool hasKey = false;
@@ -46,6 +48,7 @@ public class AutomaticDoors : PurchasableInteractable
         //Disable this interaction collider entirely so it can't be triggered again
         if (TryGetComponent(out Collider col)) col.enabled = false;
 
+        if (audioSource != null) audioSource.Play();
         return true;
     }
 
@@ -54,7 +57,7 @@ public class AutomaticDoors : PurchasableInteractable
     {
         if (hasBeenPurchased) return "";
 
-        if (!hasKey) return $"Locked: Requires {doorID} Key and has a cost of {Cost}";
+        if (!hasKey) return $"Locked: Requires {doorID}, and has a cost of {Cost} points";
         return $"{BaseInteractString} [Cost: {Cost}]";
     }
 

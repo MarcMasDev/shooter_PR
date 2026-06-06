@@ -97,6 +97,24 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "Weapon2",
+                    "type": "Button",
+                    "id": "1b8677de-9bc3-402b-ab67-329d2663827a",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Weapon3",
+                    "type": "Button",
+                    "id": "feac8953-0fad-4181-8d04-91a2b0036b4b",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "Handbrake",
                     "type": "Button",
                     "id": "23555edf-eb7a-46b0-acb2-e75aabd717e0",
@@ -454,6 +472,28 @@
                     "processors": "",
                     "groups": ";KeyboardMouse",
                     "action": "Weapon1",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "5aeae7da-efed-42b9-a198-ce4599524399",
+                    "path": "<Keyboard>/2",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";KeyboardMouse",
+                    "action": "Weapon2",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "67e8aacf-7c77-4f06-beae-dd44db3ae66e",
+                    "path": "<Keyboard>/3",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";KeyboardMouse",
+                    "action": "Weapon3",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

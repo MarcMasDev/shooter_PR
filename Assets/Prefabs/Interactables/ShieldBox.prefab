@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4726922727926322340}
+  - component: {fileID: 2353194640490610401}
   m_Layer: 0
   m_Name: ShieldBox
   m_TagString: Untagged
@@ -33,6 +34,27 @@ Transform:
   - {fileID: 5316169718358376399}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
+--- !u!65 &2353194640490610401
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4738545111593604931}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.08123315, y: 0.052983057, z: 0.15512569}
+  m_Center: {x: -3.7618715e-17, y: 0.026463041, z: -2.3503899e-17}
 --- !u!1 &5304832981373308626
 GameObject:
   m_ObjectHideFlags: 0
@@ -43,7 +65,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2040628695229906867}
   - component: {fileID: 3237311464181471246}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Audio Source
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -74,7 +96,7 @@ AudioSource:
   m_GameObject: {fileID: 5304832981373308626}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: -6308096960867818362, guid: 421767142f77f5d43ba0ca7db38a93fa, type: 2}
+  OutputAudioMixerGroup: {fileID: 839525813069814580, guid: 3dc5bcb72860b6345a662a8ccec7587f, type: 2}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 8300000, guid: 3f7f3e80fe383454288d8f8c2176416a, type: 3}
   m_PlayOnAwake: 0
@@ -173,10 +195,9 @@ GameObject:
   - component: {fileID: 5316169718358376399}
   - component: {fileID: 6456740542946128419}
   - component: {fileID: 8841298256130678645}
-  - component: {fileID: 4322746356001569822}
   - component: {fileID: 361921048425292324}
   - component: {fileID: 8672358322087953003}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: ShieldBox (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -255,27 +276,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &4322746356001569822
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5794060053042104054}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.08123315, y: 0.052983057, z: 0.15512569}
-  m_Center: {x: -3.7618715e-17, y: 0.026463041, z: -2.3503899e-17}
 --- !u!65 &361921048425292324
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -309,7 +309,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c6e16eb67b589046ba3e8a138afcab7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  interactString: 'Press ''E'' to restore: '
+  interactString: '[E] Restore'
+  cost: 100
   healAmount: 0
   shieldAmount: 25
   audioSource: {fileID: 3237311464181471246}
+  toDestroy: {fileID: 4738545111593604931}

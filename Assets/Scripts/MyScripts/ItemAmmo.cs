@@ -1,12 +1,12 @@
 using UnityEngine;
 using UnityEngine.Audio;
 
-public class ItemAmmo : MonoBehaviour, IInteractable
+public class ItemAmmo : PurchasableInteractable
 {
-    [SerializeField] private string interactString = "Press 'E' to add ";
     [SerializeField] private int clips = 1;
     [SerializeField] private AudioSource audioSource;
-    public bool Interact(GameObject user)
+
+    protected override bool ExecuteInteraction(GameObject user)
     {
         WeaponInventory inventory = user.GetComponent<WeaponInventory>();
         if (inventory != null)
@@ -23,5 +23,17 @@ public class ItemAmmo : MonoBehaviour, IInteractable
         }
         return false;
     }
-    public string GetInteractionText() => interactString + "+" + clips + " clip(s) to the weapon";
+
+    public override string GetInteractionText()
+    {
+        string clipText = "clips";
+        if (clips == 1) clipText = "clip";
+
+        string extraInfo = $"{clips} {clipText} to the weapon";
+        if (Cost > 0)
+        {
+            return $"{BaseInteractString} {extraInfo}: {Cost} points";
+        }
+        return $"{BaseInteractString} {extraInfo}";
+    }
 }

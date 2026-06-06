@@ -44,4 +44,6 @@ public class GameManager : MonoBehaviour
     {
         return m_PlayerInput;
     }
+
+    public Camera GetMainCamera() => cameraMain;
 }

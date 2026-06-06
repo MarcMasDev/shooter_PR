@@ -17,6 +17,7 @@ public class InteractionManager : MonoBehaviour
 
     //Seguimiento de todos los elementos interactivos que se encuentran dentro de la activación
     private List<IInteractable> nearbyInteractables = new List<IInteractable>();
+
     private void Start()
     {
         //Cache the input actions by name
@@ -24,6 +25,7 @@ public class InteractionManager : MonoBehaviour
     }
     private void Update()
     {
+        transform.position = transform.parent.position;
         UpdateClosestInteractable();
 
         if (m_interact.triggered && currentInteractable != null) HandleInteraction();
@@ -68,7 +70,8 @@ public class InteractionManager : MonoBehaviour
     private void HandleInteraction()
     {
         //Intentamos interactuar y guardamos si funciona
-        bool success = currentInteractable.Interact(gameObject);
+        bool success = currentInteractable.Interact(GameManager.Instance.GetPlayerTransform().gameObject);
+        print(success);
 
         if (success)
         {
@@ -79,11 +82,9 @@ public class InteractionManager : MonoBehaviour
     }
     private void OnTriggerEnter(Collider other)
     {
-        print("Entered: " + other.transform.name);
         IInteractable interactable = other.GetComponent<IInteractable>();
         if (interactable != null && !nearbyInteractables.Contains(interactable))
         {
-            print("Object accepted: " + other.transform.name);
             nearbyInteractables.Add(interactable);
         }
     }

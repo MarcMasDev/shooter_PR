@@ -7,6 +7,7 @@ public class ItemHealth : PurchasableInteractable
     [SerializeField] private float healAmount = 25f;
     [SerializeField] private float shieldAmount = 25f;
     [SerializeField] private AudioSource audioSource;
+    [SerializeField] private GameObject toDestroy;
 
     protected override bool ExecuteInteraction(GameObject user)
     {
@@ -22,12 +23,11 @@ public class ItemHealth : PurchasableInteractable
         if (startHealth != healAmount || startShield != shieldAmount)
         {
             if (audioSource != null) audioSource.Play();
+
+            Destroy(toDestroy);
+            return true;
         }
-
-        bool consumed = healAmount <= 0 && shieldAmount <= 0;
-        if (consumed) Destroy(gameObject);
-
-        return consumed;
+        return false;
     }
 
     private void ApplyHealth(EntityHealth health)
@@ -64,7 +64,7 @@ public class ItemHealth : PurchasableInteractable
 
         if (Cost > 0)
         {
-            return $"{BaseInteractString} {extraInfo} [Cost: {Cost}]";
+            return $"{BaseInteractString} {extraInfo}: {Cost} points";
         }
         return $"{BaseInteractString} {extraInfo}";
     }

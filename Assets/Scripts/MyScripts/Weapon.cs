@@ -23,13 +23,17 @@ public abstract class Weapon : MonoBehaviour
 
     [SerializeField] protected float vfxDestroyTime = 10f;
     [SerializeField] protected LayerMask impactLayer;
-    [HideIf("isPlayer")][SerializeField] protected Transform origin;
 
     [SerializeField] private Animator impactCrosshair;
 
     protected float nextFireTime;
     protected bool isFiring;
+
+    [HideIf("HideOrigin")][SerializeField] protected Transform origin;
+
+    private bool HideOrigin => isPlayer && !isMelee;
     private bool isPlayer => CompareTag("Player");
+    private bool isMelee => weaponInfo.isMelee;
     public virtual void TryShoot(bool initCooldown = false)
     {
         if (weaponInfo == null || m_StateBlackboard.m_IsPerformingAction) return;
@@ -122,7 +126,7 @@ public abstract class Weapon : MonoBehaviour
     private bool IsBloodAgent(Collider hit) => (bloodLayers.value & (1 << hit.gameObject.layer)) != 0;
     protected Ray GetRayOrigin()
     {
-        if (isPlayer) return Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
+        if (isPlayer && !isMelee) return Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
         else return new Ray(origin.position, origin.forward); ;
     }
 

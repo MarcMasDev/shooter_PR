@@ -42,13 +42,14 @@ namespace UnityStandardAssets.Vehicles.Car
         public float dopplerLevel = 1;                                              // The mount of doppler effect used in the audio
         public bool useDoppler = true;                                              // Toggle for using doppler
 
-        private AudioSource m_LowAccel; // Source for the low acceleration sounds
-        private AudioSource m_LowDecel; // Source for the low deceleration sounds
-        private AudioSource m_HighAccel; // Source for the high acceleration sounds
-        private AudioSource m_HighDecel; // Source for the high deceleration sounds
+        [SerializeField] private AudioSource m_LowAccel; // Source for the low acceleration sounds
+        [SerializeField] private AudioSource m_LowDecel; // Source for the low deceleration sounds
+        [SerializeField] private AudioSource m_HighAccel; // Source for the high acceleration sounds
+        [SerializeField] private AudioSource m_HighDecel; // Source for the high deceleration sounds
         private bool m_StartedSound; // flag for knowing if we have started sounds
         private CarController m_CarController; // Reference to car we are controlling
 
+        private float engineFade = 1f;
 
         private void StartSound()
         {
@@ -56,14 +57,14 @@ namespace UnityStandardAssets.Vehicles.Car
             m_CarController = GetComponent<CarController>();
 
             // setup the simple audio source
-            m_HighAccel = SetUpEngineAudioSource(highAccelClip);
+            SetUpEngineAudioSource(highAccelClip, m_HighAccel);
 
             // if we have four channel audio setup the four audio sources
             if (engineSoundStyle == EngineAudioOptions.FourChannel)
             {
-                m_LowAccel = SetUpEngineAudioSource(lowAccelClip);
-                m_LowDecel = SetUpEngineAudioSource(lowDecelClip);
-                m_HighDecel = SetUpEngineAudioSource(highDecelClip);
+                SetUpEngineAudioSource(lowAccelClip, m_LowAccel);
+                SetUpEngineAudioSource(lowDecelClip, m_LowDecel);
+                SetUpEngineAudioSource(highDecelClip, m_HighDecel);
             }
 
             // flag that we have started the sounds playing
@@ -92,7 +93,7 @@ namespace UnityStandardAssets.Vehicles.Car
         private void Update()
         {
             // get the distance to main camera
-            float camDist = (Camera.main.transform.position - transform.position).sqrMagnitude;
+            float camDist = (GameManager.Instance.GetMainCamera().transform.position - transform.position).sqrMagnitude;
 
             // stop sound if the object is beyond the maximum roll off distance
             if (m_StartedSound && camDist > maxRolloffDistance*maxRolloffDistance)
@@ -105,7 +106,6 @@ namespace UnityStandardAssets.Vehicles.Car
             {
                 StartSound();
             }
-
             if (m_StartedSound)
             {
                 // The pitch is interpolated between the min and max values, according to the car's revs.
@@ -145,11 +145,13 @@ namespace UnityStandardAssets.Vehicles.Car
                     accFade = 1 - ((1 - accFade)*(1 - accFade));
                     decFade = 1 - ((1 - decFade)*(1 - decFade));
 
-                    // adjust the source volumes based on the fade values
-                    m_LowAccel.volume = lowFade*accFade;
-                    m_LowDecel.volume = lowFade*decFade;
-                    m_HighAccel.volume = highFade*accFade;
-                    m_HighDecel.volume = highFade*decFade;
+                    float targetFade =(!m_CarController.m_IsOccupied && m_CarController.m_BrakeWhenUnoccupied)? 0f: 1f;
+
+                    engineFade = Mathf.Lerp(engineFade, targetFade, Time.deltaTime * 2f);
+                    m_LowAccel.volume = lowFade * accFade * engineFade;
+                    m_LowDecel.volume = lowFade * decFade * engineFade;
+                    m_HighAccel.volume = highFade * accFade * engineFade;
+                    m_HighDecel.volume = highFade * decFade * engineFade;
 
                     // adjust the doppler levels
                     m_HighAccel.dopplerLevel = useDoppler ? dopplerLevel : 0;
@@ -162,10 +164,9 @@ namespace UnityStandardAssets.Vehicles.Car
 
 
         // sets up and adds new audio source to the gane object
-        private AudioSource SetUpEngineAudioSource(AudioClip clip)
+        private AudioSource SetUpEngineAudioSource(AudioClip clip, AudioSource source)
         {
             // create the new audio source component on the game object and set up its properties
-            AudioSource source = gameObject.AddComponent<AudioSource>();
             source.clip = clip;
             source.volume = 0;
             source.loop = true;
