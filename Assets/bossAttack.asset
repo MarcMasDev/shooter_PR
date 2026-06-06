@@ -15,7 +15,7 @@ MonoBehaviour:
   weaponName: Zombie
   isMelee: 1
   meleeRange: 1.5
-  meleeRadius: 1
+  meleeRadius: 2
   fireMode: 0
   fireRate: 3
   burstCount: 3

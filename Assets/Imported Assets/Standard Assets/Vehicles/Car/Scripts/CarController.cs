@@ -59,6 +59,7 @@ namespace UnityStandardAssets.Vehicles.Car
         [Header("Occupancy Settings")]
         public bool m_BrakeWhenUnoccupied = true;
         [HideInInspector] public bool m_IsOccupied = true;
+        private CarAIControl carAI;
         public bool IsOccupied
         {
             get { return m_IsOccupied; }
@@ -77,6 +78,7 @@ namespace UnityStandardAssets.Vehicles.Car
         // Use this for initialization
         private void Start()
         {
+            carAI = GetComponent<CarAIControl>();
             m_WheelMeshLocalRotations = new Quaternion[4];
             for (int i = 0; i < 4; i++)
             {
@@ -396,6 +398,8 @@ namespace UnityStandardAssets.Vehicles.Car
 
         private void BrakeFully()
         {
+            if(carAI != null) if (carAI.enabled) return;
+
             for (int i = 0; i < 4; i++)
             {
                 if (m_WheelColliders[i] != null)

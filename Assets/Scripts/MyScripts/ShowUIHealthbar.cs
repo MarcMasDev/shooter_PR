@@ -17,7 +17,11 @@ public class ShowUIHealthbar : MonoBehaviour
     private void Hurt(Vector2 vector1, Vector2 vector2) => EnableHealthbar(true);
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player")) EnableHealthbar(true);  
+        if (other.CompareTag("Player"))
+        {
+            EnableHealthbar(true);
+            m_health.TakeDamage(0);
+        }
     }
     private void OnTriggerExit(Collider other)
     {
@@ -26,6 +30,5 @@ public class ShowUIHealthbar : MonoBehaviour
     private void EnableHealthbar(bool enabled)
     {
         healthBar.SetActive(enabled);
-        if (enabled) m_health.TakeDamage(0);
     }
 }
