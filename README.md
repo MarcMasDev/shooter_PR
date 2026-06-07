@@ -2,8 +2,6 @@
 
 ### Marc Mas Vidal, Programació en Unity 3D
 
-https://github.com/MarcMasDev/shooter\_PR
-
 
 
 Juego de acción y supervivencia zombie en un entorno urbano abierto. El jugador debe sobrevivir en una ciudad infestada, gestionando recursos (vida y munición), conduciendo vehículos y enfrentándose a oleadas de enemigos. El proyecto incluye sistemas complejos de IA para zombies y peatones, tráfico autónomo, mecánicas de conducción, y un sistema de progresión tipo survival.
