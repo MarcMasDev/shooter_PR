@@ -123,8 +123,13 @@ public class WeaponInventory : MonoBehaviour
             {
                 weapons[i].weapon.gameObject.SetActive(true);
                 weapons[i].weapon.EnableInput();
-                helperHand.localPosition = weapons[i].handPos.localPosition;
-                helperHand.localRotation = weapons[i].handPos.localRotation;
+
+                if (helperHand != null)
+                {
+                    helperHand.localPosition = weapons[i].handPos.localPosition;
+                    helperHand.localRotation = weapons[i].handPos.localRotation;
+                }
+
             }
             else weapons[i].weapon.gameObject.SetActive(false);
         }

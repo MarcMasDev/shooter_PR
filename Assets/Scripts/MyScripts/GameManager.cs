@@ -33,9 +33,14 @@ public class GameManager : MonoBehaviour
         player.gameObject.SetActive(enable);
         cameraMain.gameObject.SetActive(enable);
     }
-
+    public void EnableInput(bool enable)
+    {
+        m_PlayerInput.enabled = enable;
+    }
     public void SetInteractParent(bool enable, Transform playerPositionParent)
     {
+        if (playerInteractor == null) return;
+
         if (enable) playerInteractor.SetParent(playerPositionParent);
         else playerInteractor.SetParent(player);
     }

@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3191109007595455648}
   - component: {fileID: 4349495509159797730}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: Audio Source
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -157,13 +157,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3652379596004312155}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0.70710576, y: -0, z: -0, w: 0.70710784}
+  m_LocalPosition: {x: 0, y: 0.026462987, z: 0.026463032}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 3885525089127030403}
-  m_LocalEulerAnglesHint: {x: -90, y: 0, z: -90}
+  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
 --- !u!33 &1546183782998847772
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -268,7 +268,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3885525089127030403}
   - component: {fileID: 7270998346812721238}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: AmmoBox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -311,5 +311,5 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.60210776, y: 0.7259721, z: 0.33464864}
-  m_Center: {x: -3.5527137e-15, y: 0.00000002980233, z: -3.552718e-15}
+  m_Size: {x: 0.60210776, y: 0.31082636, z: 0.6399415}
+  m_Center: {x: 0, y: 0.06612137, z: 0.03068319}

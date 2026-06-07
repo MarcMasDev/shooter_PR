@@ -10,8 +10,6 @@ public class AutomaticDoors : PurchasableInteractable
     [Header("Door Moving Parts")]
     public Transform leftDoor;
     public Transform rightDoor;
-    public Transform leftClosedLocation;
-    public Transform rightClosedLocation;
     public Transform leftOpenLocation;
     public Transform rightOpenLocation;
     public AudioSource audioSource;

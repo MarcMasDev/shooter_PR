@@ -3,6 +3,7 @@ using UnityEngine.InputSystem;
 
 public class GetToMousePos : MonoBehaviour
 {
+
     [Header("References")]
     [SerializeField] private Camera cam;
 
@@ -11,16 +12,18 @@ public class GetToMousePos : MonoBehaviour
     [SerializeField] private float maxDistance = 1000f;
     [SerializeField] private float smoothSpeed = 20f;
 
+    private void Start()
+    {
+        if (cam == null) cam = GameManager.Instance.GetMainCamera();
+    }
     private void Update()
     {
         //Mouse position using NEW Input System
         Vector2 mousePosition = Mouse.current.position.ReadValue();
-
         //Create ray from camera through mouse
         Ray ray = cam.ScreenPointToRay(mousePosition);
 
         Vector3 targetPoint;
-
         //Raycast into world
         if (Physics.Raycast(ray, out RaycastHit hit, maxDistance, aimLayers))
         {
@@ -33,6 +36,6 @@ public class GetToMousePos : MonoBehaviour
         }
 
         //Smooth aim target movement
-        transform.position = Vector3.Lerp(transform.position,targetPoint, Time.deltaTime * smoothSpeed);
+        transform.position = Vector3.Lerp(transform.position, targetPoint, Time.deltaTime * smoothSpeed);
     }
 }

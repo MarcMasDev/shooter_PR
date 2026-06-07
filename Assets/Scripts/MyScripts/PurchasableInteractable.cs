@@ -3,7 +3,7 @@ using UnityEngine;
 public abstract class PurchasableInteractable : MonoBehaviour, IInteractable
 {
     [Header("Purchase Settings")]
-    [SerializeField] private string interactString = "Interact";
+    [SerializeField] protected string interactString = "Interact";
     [SerializeField] private int cost = 0;
 
     public int Cost => cost;

@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4726922727926322340}
   - component: {fileID: 2353194640490610401}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: ShieldBox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -27,8 +27,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
   m_LocalPosition: {x: -1.83, y: 0.11, z: 6.466}
-  m_LocalScale: {x: 7.613298, y: 7.613298, z: 7.613298}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 6, y: 6, z: 6}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 2040628695229906867}
   - {fileID: 5316169718358376399}
@@ -65,7 +65,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2040628695229906867}
   - component: {fileID: 3237311464181471246}
-  m_Layer: 11
+  m_Layer: 15
   m_Name: Audio Source
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -63,8 +63,17 @@ namespace UnityStandardAssets.Utility
                 target = new GameObject(name + " Waypoint Target").transform;
             }
 
-            Reset();
+            FindClosestWaypoint();
         }
+
+        private void OnEnable()
+        {
+            if (circuit != null)
+            {
+                FindClosestWaypoint();
+            }
+        }
+
 
 
         // reset the object to sensible values
@@ -79,6 +88,49 @@ namespace UnityStandardAssets.Utility
             }
         }
 
+        private void FindClosestWaypoint()
+        {
+            // Si no hay circuito válido o no tiene waypoints, salimos para evitar errores
+            if (circuit == null || circuit.Waypoints == null || circuit.Waypoints.Length == 0)
+                return;
+
+            // Inicializamos variables para buscar el waypoint más cercano
+            float closestSqrDist = float.MaxValue; // Empezamos con el valor más alto posible
+            int closestIndex = 0;
+
+            // Recorremos todos los waypoints del circuito
+            for (int i = 0; i < circuit.Waypoints.Length; i++)
+            {
+                Transform waypoint = circuit.Waypoints[i];
+
+                // Calculamos la distancia
+                float sqrDist = (transform.position - waypoint.position).sqrMagnitude;
+
+                // Si este waypoint está más cerca que los anteriores, lo guardamos como el nuevo favorito
+                if (sqrDist < closestSqrDist)
+                {
+                    closestSqrDist = sqrDist;
+                    closestIndex = i;
+                }
+            }
+
+            progressNum = closestIndex;
+
+            //Sumamos tramo por tramo la distancia exacta del circuito.
+            float accumulatedDistance = 0f;
+            for (int i = 1; i <= closestIndex; i++)
+            {
+                accumulatedDistance += Vector3.Distance(circuit.Waypoints[i].position, circuit.Waypoints[i - 1].position);
+            }
+            progressDistance = accumulatedDistance;
+
+            // Actualizamos la posición y rotación del objeto objetivo (target) con las del waypoint más cercano
+            target.position = circuit.Waypoints[closestIndex].position;
+            target.rotation = circuit.Waypoints[closestIndex].rotation;
+
+            // Registramos nuestra posición actual para el próximo cálculo
+            lastPosition = transform.position;
+        }
 
         private void Update()
         {
@@ -135,7 +187,6 @@ namespace UnityStandardAssets.Utility
                 lastPosition = transform.position;
             }
         }
-
 
         private void OnDrawGizmos()
         {

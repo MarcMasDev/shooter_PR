@@ -19,23 +19,14 @@ public class Turbo : MonoBehaviour
     private float currentTurbo = 0;
     private bool canBoost = true;
 
-    private PlayerInput m_PlayerInput;
     private InputAction m_HandbrakeAction;
 
-    private void Awake()
-    {
-        m_PlayerInput = GetComponent<PlayerInput>();
-    }
     private void Start()
     {
+        m_HandbrakeAction = GameManager.Instance.GetInput().actions["Handbrake"];
         rb = GetComponent<Rigidbody>();
         currentTurbo = maxTurbo;
         SetParticles(false);
-
-        if (m_PlayerInput != null)
-        {
-            m_HandbrakeAction = m_PlayerInput.actions["Handbrake"];
-        }
     }
 
     private void Update()

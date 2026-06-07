@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1864170618208582900}
   - component: {fileID: 6679159407638812529}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: MedicalBox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -27,8 +27,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0.148, y: 0.11, z: 6.4655504}
-  m_LocalScale: {x: 7.613298, y: 7.613298, z: 7.613298}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 6, y: 6, z: 6}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 3865262194353393290}
   - {fileID: 5075770711168818358}
@@ -65,7 +65,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3865262194353393290}
   - component: {fileID: 8300210984872123258}
-  m_Layer: 11
+  m_Layer: 15
   m_Name: Audio Source (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}

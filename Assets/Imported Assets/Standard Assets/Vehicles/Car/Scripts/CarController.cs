@@ -32,6 +32,7 @@ namespace UnityStandardAssets.Vehicles.Car
         [SerializeField] private float m_Downforce = 100f;
         [SerializeField] private SpeedType m_SpeedType;
         [SerializeField] private float m_Topspeed = 200;
+        [SerializeField] private float m_TopspeedPlayer = 200;
         [SerializeField] private static int NoOfGears = 5;
         [SerializeField] private float m_RevRangeBoundary = 1f;
         [SerializeField] private float m_SlipLimit;
@@ -52,7 +53,12 @@ namespace UnityStandardAssets.Vehicles.Car
         public float BrakeInput { get; private set; }
         public float CurrentSteerAngle{ get { return m_SteerAngle; }}
         public float CurrentSpeed{ get { return m_Rigidbody.linearVelocity.magnitude*2.23693629f; }}
-        public float MaxSpeed{get { return m_Topspeed; }}
+        public float MaxSpeed{get 
+            {            
+                if (carUser != null) if (carUser.enabled) return m_TopspeedPlayer;
+                return m_Topspeed;
+            }
+        }
         public float Revs { get; private set; }
         public float AccelInput { get; private set; }
 
@@ -60,6 +66,7 @@ namespace UnityStandardAssets.Vehicles.Car
         public bool m_BrakeWhenUnoccupied = true;
         [HideInInspector] public bool m_IsOccupied = true;
         private CarAIControl carAI;
+        private CarUserControl carUser;
         public bool IsOccupied
         {
             get { return m_IsOccupied; }
@@ -79,6 +86,7 @@ namespace UnityStandardAssets.Vehicles.Car
         private void Start()
         {
             carAI = GetComponent<CarAIControl>();
+            carUser = GetComponent<CarUserControl>();
             m_WheelMeshLocalRotations = new Quaternion[4];
             for (int i = 0; i < 4; i++)
             {
@@ -212,14 +220,14 @@ namespace UnityStandardAssets.Vehicles.Car
                 case SpeedType.MPH:
 
                     speed *= 2.23693629f;
-                    if (speed > m_Topspeed)
-                        m_Rigidbody.linearVelocity = (m_Topspeed/2.23693629f) * m_Rigidbody.linearVelocity.normalized;
+                    if (speed > MaxSpeed)
+                        m_Rigidbody.linearVelocity = (MaxSpeed / 2.23693629f) * m_Rigidbody.linearVelocity.normalized;
                     break;
 
                 case SpeedType.KPH:
                     speed *= 3.6f;
-                    if (speed > m_Topspeed)
-                        m_Rigidbody.linearVelocity = (m_Topspeed/3.6f) * m_Rigidbody.linearVelocity.normalized;
+                    if (speed > MaxSpeed)
+                        m_Rigidbody.linearVelocity = (MaxSpeed /3.6f) * m_Rigidbody.linearVelocity.normalized;
                     break;
             }
         }
@@ -399,6 +407,7 @@ namespace UnityStandardAssets.Vehicles.Car
         private void BrakeFully()
         {
             if(carAI != null) if (carAI.enabled) return;
+            if(carUser != null) if (carUser.enabled) return;
 
             for (int i = 0; i < 4; i++)
             {

@@ -5,8 +5,8 @@ using UnityStandardAssets.Vehicles.Car;
 
 public class CarStatusDisplayerUI : MonoBehaviour
 {
-    private CarController carController;
-    private Turbo turboController;
+    [SerializeField] private CarController carController;
+    [SerializeField] private Turbo turboController;
 
     [Header("Speed Settings")]
     [SerializeField] private Slider speedSlider;
@@ -22,10 +22,6 @@ public class CarStatusDisplayerUI : MonoBehaviour
 
     private void Start()
     {
-        GameObject player = GameObject.FindGameObjectWithTag("Player");
-        carController = player.GetComponent<CarController>();
-        turboController = player.GetComponent<Turbo>();
-
         InitSpeedSlider();
         InitBoostSlider();
     }

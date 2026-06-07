@@ -2,11 +2,13 @@ using UnityEngine;
 
 public class StealCar : PurchasableInteractable
 {
+    [SerializeField] private string getDownOfTheCarInteractionString;
     [SerializeField] private Transform playerPositionParent;
 
     [SerializeField] private Behaviour[] componentsAI;
     [SerializeField] private Behaviour[] componentsPlayer;
     [SerializeField] private GameObject[] gameObjectsPlayer;
+
 
     private bool inTheCar = false;
     private void Start()
@@ -25,6 +27,13 @@ public class StealCar : PurchasableInteractable
         return true;
     }
 
+    //Dynamic UI Prompt management
+    public override string GetInteractionText()
+    {
+        if (inTheCar) return getDownOfTheCarInteractionString;
+
+        return interactString;
+    }
     private void SetComponents()
     {
         //ai
