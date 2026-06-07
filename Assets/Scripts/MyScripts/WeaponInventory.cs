@@ -59,7 +59,7 @@ public class WeaponInventory : MonoBehaviour
     {
         int previousSelectedWeapon = selectedWeaponIndex;
 
-        // Input: rueda. The new Input System reads Scroll as a Vector2. We want the Y axis.
+        // Input: rueda
         float scroll = 0f;
         if (m_ScrollAction != null)
         {
